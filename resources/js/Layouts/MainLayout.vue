@@ -206,13 +206,32 @@
 
                 <div v-if="$page.props.auth.user.is_admin" class="border-t border-surface-100 pt-2 mt-2">
                   <p class="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">الإدارة</p>
-                  <Link href="/admin/teachers" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
-                    :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/TeachersIndex' || $page.component === 'Admin/TeacherDetails' }">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <!-- Mobile Teachers Dropdown -->
+                  <button @click="mobileTeachersOpen = !mobileTeachersOpen" class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200">
+                    <span class="flex items-center gap-3">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      المدرسون
+                    </span>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': mobileTeachersOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
-                    {{ $t('navigation.management') }}
-                  </Link>
+                  </button>
+                  <div v-if="mobileTeachersOpen" class="mr-8 space-y-1 border-r-2 border-primary-200 pr-3">
+                    <Link href="/admin/teachers" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
+                      :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/TeachersIndex' && $page.props.currentStatus !== 'approved' && $page.props.currentStatus !== 'rejected' }">
+                      قيد المراجعة
+                    </Link>
+                    <Link href="/admin/teachers?status=approved" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
+                      :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/TeachersIndex' && $page.props.currentStatus === 'approved' }">
+                      المقبولون
+                    </Link>
+                    <Link href="/admin/teachers?status=rejected" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
+                      :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/TeachersIndex' && $page.props.currentStatus === 'rejected' }">
+                      المرفوضون
+                    </Link>
+                  </div>
                   <Link href="/admin/subjects" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
                     :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Subjects' }">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,6 +296,7 @@ const currentLocale = ref(locale.value)
 const showMenu = ref(false)
 const showMobileMenu = ref(false)
 const teachersDropdown = ref(false)
+const mobileTeachersOpen = ref(false)
 
 const page = usePage()
 const showTeachersActive = computed(() =>

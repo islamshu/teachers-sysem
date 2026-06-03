@@ -42,6 +42,10 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        if ($request->user()->is_admin) {
+            return back()->with('message', 'لا يمكن حذف حساب المشرف');
+        }
+
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);

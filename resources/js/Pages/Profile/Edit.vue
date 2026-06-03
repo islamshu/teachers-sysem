@@ -78,7 +78,7 @@
       </div>
 
       <!-- Delete Account -->
-      <div class="card p-6 animate-fade-in-up animate-delay-200">
+      <div v-if="!user?.is_admin" class="card p-6 animate-fade-in-up animate-delay-200">
         <h2 class="text-xl font-bold text-red-600 mb-2">حذف الحساب</h2>
         <p class="text-sm text-slate-500 mb-6">بمجرد حذف حسابك، لا يمكن استرجاع البيانات</p>
 

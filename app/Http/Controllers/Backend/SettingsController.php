@@ -20,7 +20,7 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'site_name' => 'nullable|string|max:255',
-            'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
             'primary_color' => 'nullable|string|max:7',
             'description' => 'nullable|string|max:1000',
             'contact_email' => 'nullable|email|max:255',

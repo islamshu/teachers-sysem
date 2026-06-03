@@ -276,9 +276,9 @@
           <p class="text-sm text-slate-500">
             © {{ new Date().getFullYear() }} {{ $page.props.settings?.site_name || $t('app.name') }}. {{ $t('messages.footer_rights') }}
           </p>
-          <p class="text-sm text-slate-400">
+          <!-- <p class="text-sm text-slate-400">
             {{ $t('messages.made_with') }} ❤️
-          </p>
+          </p> -->
         </div>
       </div>
     </footer>

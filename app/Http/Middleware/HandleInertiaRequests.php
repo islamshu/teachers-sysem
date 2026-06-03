@@ -38,6 +38,7 @@ class HandleInertiaRequests extends Middleware
             'locale' => session('locale', 'ar'),
             'flash' => [
                 'message' => session('message'),
+                'status' => session('status'),
             ],
             'settings' => Setting::getAll(),
         ];

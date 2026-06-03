@@ -158,6 +158,9 @@
                     <Link href="/dashboard" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
                       {{ $t('navigation.dashboard') }}
                     </Link>
+                    <Link href="/profile" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                      الملف الشخصي
+                    </Link>
                     <form @submit.prevent="logout">
                       <button type="submit" class="w-full text-right px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                         {{ $t('navigation.logout') }}

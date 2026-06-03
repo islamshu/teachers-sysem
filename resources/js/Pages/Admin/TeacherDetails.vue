@@ -1,0 +1,231 @@
+<template>
+  <MainLayout>
+    <div>
+      <!-- Back Button -->
+      <button @click="goBack" class="btn-ghost mb-6 animate-fade-in-up">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        {{ $t('messages.back') }}
+      </button>
+
+      <!-- Header Card -->
+      <div class="card p-8 mb-6 animate-fade-in-up animate-delay-100">
+        <div class="flex items-start gap-6">
+          <!-- Photo -->
+          <div class="flex-shrink-0">
+            <div class="w-28 h-28 rounded-2xl bg-gradient-to-br from-primary-100 to-surface-100 overflow-hidden shadow-lg shadow-primary-500/10">
+              <img
+                v-if="teacher.photo"
+                :src="`/storage/${teacher.photo}`"
+                :alt="teacher.user?.name"
+                class="w-full h-full object-cover"
+              />
+              <div v-else class="w-full h-full flex items-center justify-center text-4xl">👨‍🏫</div>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-1">{{ teacher.user?.name }}</h1>
+            <p class="text-slate-500 mb-4">{{ teacher.user?.email }}</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="p-3 rounded-xl bg-primary-50">
+                <p class="text-xs font-semibold text-primary-600 mb-0.5">{{ $t('messages.subject') }}</p>
+                <p class="font-bold text-slate-900">{{ teacher.subject?.name }}</p>
+              </div>
+              <div class="p-3 rounded-xl bg-warm-50">
+                <p class="text-xs font-semibold text-warm-600 mb-0.5">{{ $t('messages.experience') }}</p>
+                <p class="font-bold text-slate-900">{{ teacher.experience_years }} {{ $t('messages.year') }}</p>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50">
+                <p class="text-xs font-semibold text-emerald-600 mb-0.5">{{ $t('messages.qualification') }}</p>
+                <p class="font-bold text-slate-900">{{ teacher.qualification || '-' }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-slate-500 mb-0.5">{{ $t('messages.status') }}</p>
+                <span v-if="teacher.status === 'pending'" class="badge-warning">{{ $t('messages.pending') }}</span>
+                <span v-else-if="teacher.status === 'approved'" class="badge-success">{{ $t('messages.approved') }}</span>
+                <span v-else class="badge-error">{{ $t('messages.rejected') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Personal Info -->
+        <div class="card p-6 animate-fade-in-up animate-delay-200">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900">{{ $t('messages.personal_details') }}</h2>
+          </div>
+          <div class="space-y-3">
+            <div class="flex justify-between py-2 border-b border-surface-100">
+              <span class="text-slate-500 text-sm">{{ $t('messages.phone') }}</span>
+              <span class="font-medium text-slate-900 ltr" dir="ltr">{{ teacher.phone || '-' }}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-surface-100">
+              <span class="text-slate-500 text-sm">{{ $t('messages.birth_date') }}</span>
+              <span class="font-medium text-slate-900">{{ formatDate(teacher.birth_date) }}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-surface-100">
+              <span class="text-slate-500 text-sm">{{ $t('messages.gender') }}</span>
+              <span class="font-medium text-slate-900">{{ teacher.gender === 'male' ? $t('messages.male') : (teacher.gender === 'female' ? $t('messages.female') : '-') }}</span>
+            </div>
+            <div class="flex justify-between py-2">
+              <span class="text-slate-500 text-sm">{{ $t('messages.location') }}</span>
+              <span class="font-medium text-slate-900">{{ teacher.residence_place || '-' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Info -->
+        <div class="card p-6 animate-fade-in-up animate-delay-300">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-warm-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900">{{ $t('messages.academic_details') }}</h2>
+          </div>
+          <div class="space-y-3">
+            <div class="flex justify-between py-2 border-b border-surface-100">
+              <span class="text-slate-500 text-sm">{{ $t('messages.subject') }}</span>
+              <span class="font-medium text-slate-900">{{ teacher.subject?.name || '-' }}</span>
+            </div>
+            <div class="py-2 border-b border-surface-100">
+              <span class="text-slate-500 text-sm block mb-2">{{ $t('messages.grade') }}</span>
+              <div class="flex flex-wrap gap-1.5">
+                <span
+                  v-for="grade in teacher.grades"
+                  :key="grade.id"
+                  class="badge-primary text-xs"
+                >
+                  {{ grade.name }}
+                </span>
+                <span v-if="!teacher.grades?.length" class="text-sm text-slate-400">-</span>
+              </div>
+            </div>
+            <div class="flex justify-between py-2">
+              <span class="text-slate-500 text-sm">{{ $t('messages.qualification') }}</span>
+              <span class="font-medium text-slate-900">{{ teacher.qualification || '-' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bio -->
+        <div class="lg:col-span-2 card p-6 animate-fade-in-up animate-delay-400">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900">{{ $t('messages.bio') }}</h2>
+          </div>
+          <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">
+            {{ teacher.bio || 'لم يتم إضافة نبذة' }}
+          </p>
+        </div>
+
+        <!-- Dates -->
+        <div class="lg:col-span-2 card p-6 animate-fade-in-up animate-delay-500">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-surface-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-surface-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900">{{ $t('messages.details') }}</h2>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-slate-500 font-semibold">{{ $t('messages.request_date') }}</p>
+              <p class="font-medium text-slate-900">{{ formatDate(teacher.created_at) }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 font-semibold">{{ $t('messages.last_update') }}</p>
+              <p class="font-medium text-slate-900">{{ formatDate(teacher.updated_at) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div v-if="teacher.status === 'pending'" class="card p-6 animate-fade-in-up animate-delay-600">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-warm-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h2 class="text-lg font-bold text-slate-900">{{ $t('messages.actions') }}</h2>
+        </div>
+        <div class="flex gap-4">
+          <button
+            @click="approveTeacher"
+            class="btn-primary px-8"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            {{ $t('messages.approve') }}
+          </button>
+          <button
+            @click="rejectTeacher"
+            class="px-6 py-3 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200 hover:shadow-lg hover:shadow-red-500/20 transition-all duration-200"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            {{ $t('messages.reject') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </MainLayout>
+</template>
+
+<script setup>
+import { useForm } from '@inertiajs/vue3'
+import MainLayout from '@/Layouts/MainLayout.vue'
+
+const props = defineProps({
+  teacher: Object,
+})
+
+const formatDate = (date) => {
+  if (!date) return '-'
+  return new Date(date).toLocaleDateString('ar-EG', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+const goBack = () => window.history.back()
+
+const approveTeacher = () => {
+  if (confirm('هل تريد قبول هذا المدرس؟')) {
+    useForm({}).patch(`/admin/teachers/${props.teacher.id}/approve`, {
+      onSuccess: () => { window.location.href = '/admin/teachers' }
+    })
+  }
+}
+
+const rejectTeacher = () => {
+  if (confirm('هل تريد رفض هذا المدرس؟')) {
+    useForm({}).patch(`/admin/teachers/${props.teacher.id}/reject`, {
+      onSuccess: () => { window.location.href = '/admin/teachers' }
+    })
+  }
+}
+</script>

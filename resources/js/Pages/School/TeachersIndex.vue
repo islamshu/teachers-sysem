@@ -8,7 +8,17 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div v-if="!isApproved" class="card p-8 text-center animate-fade-in-up">
+        <div class="w-20 h-20 rounded-3xl bg-amber-100 flex items-center justify-center mx-auto mb-5">
+          <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">بيانات المدرسة غير معتمدة</h3>
+        <p class="text-slate-500 max-w-md mx-auto">يجب أن تتم الموافقة على بيانات المدرسة أولاً قبل التمكن من إرسال دعوات للمدرسين. يرجى الانتظار حتى تقوم الإدارة بمراجعة واعتماد بيانات المدرسة.</p>
+      </div>
+
+      <div v-if="isApproved" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <div
           v-for="teacher in teachersList"
           :key="teacher.id"
@@ -57,7 +67,7 @@
         </div>
       </div>
 
-      <div ref="sentinel" class="flex justify-center py-8">
+      <div v-if="isApproved" ref="sentinel" class="flex justify-center py-8">
         <div v-if="loading" class="flex items-center gap-3 text-slate-500">
           <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -134,6 +144,7 @@ const props = defineProps({
   teachers: Array,
   nextPage: Number,
   subjects: Array,
+  isApproved: Boolean,
 })
 
 const teachersList = ref([...props.teachers])

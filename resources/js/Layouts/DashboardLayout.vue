@@ -295,47 +295,49 @@
                 </Link>
               </template>
 
-              <div class="border-t border-surface-200 my-3"></div>
-              <p class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">التوظيف</p>
+              <template v-if="$page.props.auth.user?.school_profile?.status === 'approved'">
+                <div class="border-t border-surface-200 my-3"></div>
+                <p class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">التوظيف</p>
 
-              <Link
-                href="/school/teachers"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
-                :class="isActive('/school/teachers') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
-              >
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/teachers') ? 'bg-primary-100' : 'bg-surface-100'">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <span>تصفح المدرسين</span>
-              </Link>
+                <Link
+                  href="/school/teachers"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="isActive('/school/teachers') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/teachers') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <span>تصفح المدرسين</span>
+                </Link>
 
-              <Link
-                href="/school/invitations"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
-                :class="isActive('/school/invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
-              >
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/invitations') ? 'bg-primary-100' : 'bg-surface-100'">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <span>الدعوات المرسلة</span>
-              </Link>
+                <Link
+                  href="/school/invitations"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="isActive('/school/invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/invitations') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span>الدعوات المرسلة</span>
+                </Link>
 
-              <Link
-                href="/school/employees"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
-                :class="isActive('/school/employees') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
-              >
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employees') ? 'bg-primary-100' : 'bg-surface-100'">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <span>المدرسون المعينون</span>
-              </Link>
+                <Link
+                  href="/school/employees"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="isActive('/school/employees') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employees') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span>المدرسون المعينون</span>
+                </Link>
+              </template>
             </nav>
           </template>
 

@@ -20,6 +20,13 @@ class EmploymentController extends Controller
     {
         $school = Auth::user()->load('schoolProfile');
 
+        $schoolProfile = $school->schoolProfile;
+        $isApproved = $schoolProfile && $schoolProfile->status === 'approved';
+
+        if (request()->wantsJson() && !$isApproved) {
+            return response()->json(['data' => [], 'current_page' => 1, 'last_page' => 1]);
+        }
+
         $teachers = TeacherProfile::with(['user', 'subject', 'grades'])
             ->where('status', 'approved')
             ->where('employment_status', 'available')
@@ -31,14 +38,21 @@ class EmploymentController extends Controller
         }
 
         return Inertia::render('School/TeachersIndex', [
-            'teachers' => $teachers->items(),
-            'nextPage' => $teachers->currentPage() < $teachers->lastPage() ? $teachers->currentPage() + 1 : null,
-            'subjects' => Subject::orderBy('name')->get(),
+            'teachers' => $isApproved ? $teachers->items() : [],
+            'nextPage' => $isApproved && $teachers->currentPage() < $teachers->lastPage() ? $teachers->currentPage() + 1 : null,
+            'subjects' => $isApproved ? Subject::orderBy('name')->get() : [],
+            'isApproved' => $isApproved,
         ]);
     }
 
     public function invite(Request $request)
     {
+        $schoolProfile = Auth::user()->schoolProfile;
+
+        if (!$schoolProfile || $schoolProfile->status !== 'approved') {
+            return back()->withErrors(['school' => 'يجب أن تكون بيانات المدرسة معتمدة أولاً']);
+        }
+
         $data = $request->validate([
             'teacher_id' => ['required', 'exists:teacher_profiles,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
@@ -113,6 +127,12 @@ class EmploymentController extends Controller
     {
         if ($employment->school_id !== Auth::id()) {
             abort(403);
+        }
+
+        $schoolProfile = Auth::user()->schoolProfile;
+
+        if (!$schoolProfile || $schoolProfile->status !== 'approved') {
+            return back()->withErrors(['school' => 'يجب أن تكون بيانات المدرسة معتمدة أولاً']);
         }
 
         if (!in_array($employment->status, ['accepted', 'interviewed'])) {

@@ -5,14 +5,25 @@
       <div class="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 shadow-2xl shadow-primary-500/20 animate-fade-in-up">
         <div class="absolute inset-0 bg-grid opacity-20"></div>
         <div class="relative px-8 py-10">
-          <div class="flex items-center gap-4 mb-3">
-            <div class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-3xl shadow-lg">
-              🏫
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4 mb-3">
+              <div class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-3xl shadow-lg">
+                🏫
+              </div>
+              <div>
+                <h1 class="text-3xl font-extrabold text-white">إدارة المدارس</h1>
+                <p class="text-primary-200">مراجعة وقبول أو رفض طلبات المدارس</p>
+              </div>
             </div>
-            <div>
-              <h1 class="text-3xl font-extrabold text-white">إدارة المدارس</h1>
-              <p class="text-primary-200">مراجعة وقبول أو رفض طلبات المدارس</p>
-            </div>
+            <Link
+              href="/admin/schools/create"
+              class="flex items-center gap-2 px-4 py-2.5 text-sm rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/30 font-bold transition-all duration-200"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              إضافة مدرسة
+            </Link>
           </div>
         </div>
       </div>

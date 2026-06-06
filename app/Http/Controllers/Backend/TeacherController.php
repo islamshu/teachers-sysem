@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Grade;
+use App\Models\Subject;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use App\Notifications\ProfileApproved;
@@ -37,6 +39,62 @@ class TeacherController extends Controller
             'nextPage' => $teachers->currentPage() < $teachers->lastPage() ? $teachers->currentPage() + 1 : null,
             'currentStatus' => $status ?: 'all',
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Admin/TeacherCreate', [
+            'subjects' => Subject::orderBy('name')->get(),
+            'grades' => Grade::orderBy('name')->get(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp'],
+            'phone' => ['required', 'string', 'max:30'],
+            'birth_date' => ['required', 'date'],
+            'gender' => ['required', 'in:male,female'],
+            'subject_id' => ['required', 'exists:subjects,id'],
+            'grade_ids' => ['required', 'array', 'min:1'],
+            'grade_ids.*' => ['exists:grades,id'],
+            'experience_years' => ['required', 'integer', 'min:0', 'max:60'],
+            'residence_place' => ['required', 'string', 'max:255'],
+            'current_location' => ['required', 'string', 'max:255'],
+            'qualification' => ['required', 'string', 'max:255'],
+            'practical_experience' => ['required', 'string'],
+            'bio' => ['required', 'string'],
+            'status' => ['nullable', 'in:pending,approved,rejected'],
+        ]);
+
+        $gradeIds = $data['grade_ids'];
+        unset($data['grade_ids']);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+            'role' => 'teacher',
+        ]);
+
+        unset($data['name'], $data['email'], $data['password']);
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('teachers', 'public');
+        }
+
+        $data['user_id'] = $user->id;
+        $data['status'] = $data['status'] ?? 'approved';
+
+        $profile = TeacherProfile::create($data);
+        $profile->grades()->sync($gradeIds);
+
+        return redirect()->route('admin.teachers.index')
+            ->with('success', 'تم إضافة المدرس بنجاح');
     }
 
     public function show(TeacherProfile $teacher)

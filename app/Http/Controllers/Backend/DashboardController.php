@@ -22,6 +22,10 @@ class DashboardController extends Controller
             'schools_pending' => SchoolProfile::where('status', 'pending')->count(),
             'schools_approved' => SchoolProfile::where('status', 'approved')->count(),
             'schools_total' => SchoolProfile::count(),
+            'users_total' => User::count(),
+            'users_teachers' => User::where('role', 'teacher')->count(),
+            'users_schools' => User::where('role', 'school')->count(),
+            'users_admins' => User::where('role', 'admin')->count(),
         ];
 
         $recentPending = TeacherProfile::with(['user', 'subject'])

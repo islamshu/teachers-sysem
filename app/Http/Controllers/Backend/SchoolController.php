@@ -7,6 +7,7 @@ use App\Models\SchoolProfile;
 use App\Models\User;
 use App\Notifications\ProfileApproved;
 use App\Notifications\ProfileRejected;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -33,6 +34,52 @@ class SchoolController extends Controller
             'nextPage' => $schools->currentPage() < $schools->lastPage() ? $schools->currentPage() + 1 : null,
             'currentStatus' => $status,
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Admin/SchoolCreate');
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'school_name' => ['required', 'string', 'max:255'],
+            'commercial_register' => ['required', 'string', 'max:255'],
+            'tax_id' => ['nullable', 'string', 'max:255'],
+            'license_number' => ['nullable', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'address' => ['nullable', 'string'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'principal_name' => ['nullable', 'string', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp'],
+            'bio' => ['nullable', 'string'],
+            'status' => ['nullable', 'in:pending,approved,rejected'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+            'role' => 'school',
+        ]);
+
+        unset($data['name'], $data['email'], $data['password']);
+
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('schools', 'public');
+        }
+
+        $data['user_id'] = $user->id;
+        $data['status'] = $data['status'] ?? 'approved';
+
+        SchoolProfile::create($data);
+
+        return redirect()->route('admin.schools.index')
+            ->with('success', 'تم إضافة المدرسة بنجاح');
     }
 
     public function approve(SchoolProfile $school)

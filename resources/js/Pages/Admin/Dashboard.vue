@@ -117,6 +117,60 @@
         </div>
       </div>
 
+      <!-- Users Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="card p-6 animate-fade-in-up animate-delay-100">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">إجمالي المستخدمين</p>
+            <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.users_total }}</div>
+          <Link href="/admin/users" class="text-sm font-medium text-primary-600 hover:text-primary-700 mt-2 inline-block transition-colors">
+            عرض الكل ←
+          </Link>
+        </div>
+
+        <div class="card p-6 animate-fade-in-up animate-delay-200">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">المدرسون</p>
+            <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.users_teachers }}</div>
+        </div>
+
+        <div class="card p-6 animate-fade-in-up animate-delay-300">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">المدارس</p>
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.users_schools }}</div>
+        </div>
+
+        <div class="card p-6 animate-fade-in-up animate-delay-400">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">الإداريون</p>
+            <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.users_admins }}</div>
+        </div>
+      </div>
+
       <!-- Recent Pending Teachers -->
       <div class="card mb-8 animate-fade-in-up animate-delay-500">
         <div class="p-6 border-b border-surface-200 flex items-center justify-between">

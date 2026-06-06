@@ -5,6 +5,7 @@ use App\Http\Controllers\Backend\LookupController;
 use App\Http\Controllers\Backend\SchoolController;
 use App\Http\Controllers\Backend\SettingsController;
 use App\Http\Controllers\Backend\TeacherController;
+use App\Http\Controllers\Backend\UserController;
 use App\Http\Controllers\Frontend\TeacherController as FrontendTeacherController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\School\EmploymentController as SchoolEmploymentController;
@@ -120,6 +121,10 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         // Teachers management
+        Route::get('/teachers/create', [TeacherController::class, 'create'])
+            ->name('teachers.create');
+        Route::post('/teachers', [TeacherController::class, 'store'])
+            ->name('teachers.store');
         Route::get('/teachers', [TeacherController::class, 'index'])
             ->name('teachers.index');
         Route::patch('/teachers/batch/approve', [TeacherController::class, 'batchApprove'])
@@ -134,6 +139,12 @@ Route::middleware('auth')->group(function () {
             ->name('teachers.show');
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy'])
             ->name('teachers.destroy');
+
+        // Users management
+        Route::get('/users', [UserController::class, 'index'])
+            ->name('users.index');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])
+            ->name('users.destroy');
 
         // Settings
         Route::get('/settings', [SettingsController::class, 'edit'])
@@ -162,6 +173,10 @@ Route::middleware('auth')->group(function () {
             ->name('grades.destroy');
 
         // Schools management
+        Route::get('/schools/create', [SchoolController::class, 'create'])
+            ->name('schools.create');
+        Route::post('/schools', [SchoolController::class, 'store'])
+            ->name('schools.store');
         Route::get('/schools', [SchoolController::class, 'index'])
             ->name('schools.index');
         Route::patch('/schools/batch/approve', [SchoolController::class, 'batchApprove'])

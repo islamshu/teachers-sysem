@@ -155,7 +155,7 @@
                 </button>
                 <div v-if="openSubmenu === 'teachers'" class="mr-4 mt-1 space-y-1 border-r-2 border-primary-200 pr-3">
                   <Link
-                    href="/admin/teachers"
+                    href="/admin/teachers?status=pending"
                     class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
                     :class="isActive('/admin/teachers') && !$page.props.currentStatus ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
                   >
@@ -192,6 +192,19 @@
                   </svg>
                 </div>
                 <span>المدارس</span>
+              </Link>
+
+              <Link
+                href="/admin/users"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/users') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/users') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                <span>المستخدمون</span>
               </Link>
 
               <Link

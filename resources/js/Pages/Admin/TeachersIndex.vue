@@ -7,9 +7,20 @@
           <h1 class="text-3xl font-extrabold text-slate-900">{{ $t('messages.admin_title') }}</h1>
           <p class="text-slate-500 mt-1">{{ $t('messages.admin_desc') }}</p>
         </div>
-        <div class="text-center px-6 py-3 rounded-2xl bg-primary-50 border border-primary-100">
-          <div class="text-3xl font-extrabold text-primary-700">{{ totalCount }}</div>
-          <p class="text-xs font-semibold text-primary-600">{{ $t('messages.pending_review') }}</p>
+        <div class="flex items-center gap-4">
+          <Link
+            href="/admin/teachers/create"
+            class="btn-primary px-4 py-2.5 text-sm"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            إضافة مدرس
+          </Link>
+          <div class="text-center px-6 py-3 rounded-2xl bg-primary-50 border border-primary-100">
+            <div class="text-3xl font-extrabold text-primary-700">{{ totalCount }}</div>
+            <p class="text-xs font-semibold text-primary-600">{{ $t('messages.pending_review') }}</p>
+          </div>
         </div>
       </div>
 
@@ -187,7 +198,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { router, useForm } from '@inertiajs/vue3'
+import { Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
 import Swal from 'sweetalert2'

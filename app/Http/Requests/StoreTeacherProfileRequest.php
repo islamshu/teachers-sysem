@@ -14,20 +14,21 @@ class StoreTeacherProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp'],
-            'phone' => ['nullable', 'string', 'max:30'],
-            'birth_date' => ['nullable', 'date'],
-            'gender' => ['nullable', 'in:male,female'],
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp'],
+            'phone' => ['required', 'string', 'max:30'],
+            'birth_date' => ['required', 'date'],
+            'gender' => ['required', 'in:male,female'],
 
             'subject_id' => ['required', 'exists:subjects,id'],
             'grade_ids' => ['required', 'array', 'min:1'],
             'grade_ids.*' => ['exists:grades,id'],
 
             'experience_years' => ['required', 'integer', 'min:0', 'max:60'],
-            'residence_place' => ['nullable', 'string', 'max:255'],
-            'current_location' => ['nullable', 'string', 'max:255'],
-            'qualification' => ['nullable', 'string', 'max:255'],
-            'bio' => ['nullable', 'string'],
+            'residence_place' => ['required', 'string', 'max:255'],
+            'current_location' => ['required', 'string', 'max:255'],
+            'qualification' => ['required', 'string', 'max:255'],
+            'practical_experience' => ['required', 'string'],
+            'bio' => ['required', 'string'],
         ];
     }
 }

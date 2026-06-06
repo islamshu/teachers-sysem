@@ -40,6 +40,7 @@
         <link rel="icon" href="{{ asset('storage/' . $siteLogo) }}" />
         @endif
 
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="theme-color" content="{{ $primaryColor }}" />
         <style>:root{ {{ $vars }} }</style>
         <script>if(top!==self){top.location=self.location}</script>

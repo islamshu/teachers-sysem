@@ -1,5 +1,5 @@
 <template>
-  <MainLayout>
+  <DashboardLayout>
     <div>
       <!-- Welcome Banner -->
       <div class="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 shadow-2xl shadow-primary-500/20 animate-fade-in-up">
@@ -72,6 +72,48 @@
             </div>
           </div>
           <div class="text-4xl font-extrabold text-slate-900">{{ stats.total }}</div>
+        </div>
+      </div>
+
+      <!-- Schools Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card p-6 animate-fade-in-up animate-delay-100">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">المدارس قيد المراجعة</p>
+            <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.schools_pending }}</div>
+          <Link href="/admin/schools" class="text-sm font-medium text-primary-600 hover:text-primary-700 mt-2 inline-block transition-colors">
+            عرض الطلبات ←
+          </Link>
+        </div>
+
+        <div class="card p-6 animate-fade-in-up animate-delay-200">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">المدارس المقبولة</p>
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.schools_approved }}</div>
+        </div>
+
+        <div class="card p-6 animate-fade-in-up animate-delay-300">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-semibold text-slate-500">إجمالي المدارس</p>
+            <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-4xl font-extrabold text-slate-900">{{ stats.schools_total }}</div>
         </div>
       </div>
 
@@ -253,13 +295,13 @@
         </div>
       </div>
     </div>
-  </MainLayout>
+  </DashboardLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import MainLayout from '@/Layouts/MainLayout.vue'
+import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 
 const props = defineProps({
   stats: Object,

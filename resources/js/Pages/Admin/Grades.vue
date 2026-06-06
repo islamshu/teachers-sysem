@@ -1,5 +1,5 @@
 <template>
-  <MainLayout>
+  <DashboardLayout>
     <div>
       <!-- Header -->
       <div class="flex items-center justify-between mb-8 animate-fade-in-up">
@@ -72,7 +72,7 @@
 
             <form @submit.prevent="submitForm">
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">اسم الصف</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">اسم الصف <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.name"
                   type="text"
@@ -93,13 +93,13 @@
         </div>
       </Teleport>
     </div>
-  </MainLayout>
+  </DashboardLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
-import MainLayout from '@/Layouts/MainLayout.vue'
+import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
 
 const props = defineProps({

@@ -15,7 +15,7 @@
         <form @submit.prevent="submit" class="p-8 space-y-8">
           <!-- Photo Upload -->
           <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.photo') }}</label>
+            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.photo') }} <span class="text-red-500">*</span></label>
             <div class="relative">
               <div class="flex items-center gap-4">
                 <div class="w-24 h-24 rounded-2xl bg-surface-100 overflow-hidden flex-shrink-0 border-2 border-dashed border-surface-300">
@@ -50,7 +50,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.phone') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.phone') }} <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.phone"
                   type="tel"
@@ -62,7 +62,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.birth_date') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.birth_date') }} <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.birth_date"
                   type="date"
@@ -73,7 +73,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.gender') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.gender') }} <span class="text-red-500">*</span></label>
                 <select v-model="form.gender" class="input-base" :class="{ 'input-error': form.errors.gender }">
                   <option value="">{{ $t('messages.select') }}</option>
                   <option value="male">{{ $t('messages.male') }}</option>
@@ -99,7 +99,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.subject') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.subject') }} <span class="text-red-500">*</span></label>
                 <select v-model="form.subject_id" class="input-base" :class="{ 'input-error': form.errors.subject_id }">
                   <option value="">{{ $t('messages.select_subject') }}</option>
                   <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
@@ -110,7 +110,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.experience_years') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.experience_years') }} <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.experience_years"
                   type="number"
@@ -122,7 +122,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.qualification') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.qualification') }} <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.qualification"
                   type="text"
@@ -134,8 +134,8 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-semibold text-slate-700 mb-3">{{ $t('messages.grade') }}</label>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <label class="block text-sm font-semibold text-slate-700 mb-3">{{ $t('messages.grade') }} <span class="text-red-500">*</span></label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                   <label
                     v-for="grade in grades"
                     :key="grade.id"
@@ -156,6 +156,21 @@
             </div>
           </div>
 
+          <!-- Practical Experience -->
+          <div class="divider"></div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.practical_experience') }} <span class="text-red-500">*</span></label>
+            <textarea
+              v-model="form.practical_experience"
+              rows="4"
+              :placeholder="$t('messages.practical_experience_placeholder')"
+              class="input-base resize-none"
+              :class="{ 'input-error': form.errors.practical_experience }"
+            ></textarea>
+            <p v-if="form.errors.practical_experience" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.practical_experience }}</p>
+          </div>
+
           <!-- Location Information -->
           <div class="divider"></div>
 
@@ -172,7 +187,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.residence_place') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.residence_place') }} <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.residence_place"
                   type="text"
@@ -184,7 +199,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.current_location') }}</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.current_location') }} <span class="text-red-500">*</span></label>
                 <input
                   v-model="form.current_location"
                   type="text"
@@ -201,7 +216,7 @@
           <div class="divider"></div>
 
           <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.bio') }}</label>
+            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.bio') }} <span class="text-red-500">*</span></label>
             <textarea
               v-model="form.bio"
               rows="4"
@@ -213,11 +228,11 @@
           </div>
 
           <!-- Submit -->
-          <div class="flex items-center gap-4 pt-6 border-t border-surface-200">
+          <div class="flex flex-wrap items-center gap-4 pt-6 border-t border-surface-200">
             <button
               type="submit"
               :disabled="form.processing"
-              class="btn-primary flex-1 md:flex-none px-10"
+              class="btn-primary flex-1 md:flex-none px-4 md:px-10"
             >
               <svg v-if="form.processing" class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -257,6 +272,7 @@ const form = useForm({
   grade_ids: props.profile?.grades?.map(g => g.id) || [],
   experience_years: props.profile?.experience_years || '',
   qualification: props.profile?.qualification || '',
+  practical_experience: props.profile?.practical_experience || '',
   residence_place: props.profile?.residence_place || '',
   current_location: props.profile?.current_location || '',
   bio: props.profile?.bio || '',

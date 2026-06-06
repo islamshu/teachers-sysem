@@ -50,4 +50,24 @@ class TeacherController extends Controller
             'nextPage' => $teachers->currentPage() < $teachers->lastPage() ? $teachers->currentPage() + 1 : null,
         ]);
     }
+
+    public function show(TeacherProfile $teacher)
+    {
+        if ($teacher->status !== 'approved') {
+            abort(404);
+        }
+
+        $teacher->load(['user', 'subject', 'grades']);
+
+        $history = \App\Models\Employment::with(['school.schoolProfile', 'subject'])
+            ->where('teacher_id', $teacher->id)
+            ->whereIn('status', ['ended'])
+            ->latest('updated_at')
+            ->get();
+
+        return Inertia::render('Teacher/Show', [
+            'teacher' => $teacher,
+            'history' => $history,
+        ]);
+    }
 }

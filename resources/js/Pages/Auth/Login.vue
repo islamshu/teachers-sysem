@@ -37,18 +37,18 @@
         <form @submit.prevent="submit">
           <!-- Email -->
           <div>
-            <label for="email" class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني</label>
+            <label for="email" class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني <span class="text-red-500">*</span></label>
             <input id="email" v-model="form.email" type="email" class="input-base" placeholder="teacher@example.com" required autofocus autocomplete="username" />
           </div>
 
           <!-- Password -->
           <div class="mt-5">
-            <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور</label>
+            <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور <span class="text-red-500">*</span></label>
             <input id="password" v-model="form.password" type="password" class="input-base" placeholder="********" required autocomplete="current-password" />
           </div>
 
           <!-- Remember & Forgot -->
-          <div class="flex items-center justify-between mt-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mt-5">
             <label for="remember_me" class="flex items-center gap-2 cursor-pointer">
               <input id="remember_me" v-model="form.remember" type="checkbox" class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500" />
               <span class="text-sm text-slate-600">تذكرني</span>

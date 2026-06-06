@@ -1,18 +1,18 @@
 <template>
-  <MainLayout>
+  <DashboardLayout>
     <div>
       <!-- Welcome Banner -->
       <div class="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 shadow-2xl shadow-primary-500/20 animate-fade-in-up">
         <div class="absolute inset-0 bg-grid opacity-20"></div>
         <div class="absolute top-0 left-0 w-48 h-48 bg-primary-400/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div class="relative px-8 py-10">
-          <div class="flex items-center gap-4 mb-3">
-            <div class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-3xl shadow-lg">
+        <div class="relative px-4 md:px-8 py-6 md:py-10">
+          <div class="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 mb-3">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-2xl sm:text-3xl shadow-lg flex-shrink-0">
               👋
             </div>
-            <div>
-              <h1 class="text-3xl font-extrabold text-white">{{ $t('messages.welcome_back') }}, {{ $page.props.auth.user?.name }}</h1>
-              <p class="text-primary-200">{{ $t('messages.dashboard_desc') }}</p>
+            <div class="text-center sm:text-right">
+              <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">{{ $t('messages.welcome_back') }}, {{ $page.props.auth.user?.name }}</h1>
+              <p class="text-primary-200 text-sm sm:text-base">{{ $t('messages.dashboard_desc') }}</p>
             </div>
           </div>
         </div>
@@ -45,21 +45,21 @@
             </template>
 
             <template v-else>
-              <div class="p-8">
-                <div class="flex items-start gap-6">
+              <div class="p-4 md:p-8">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6">
                     <div class="relative flex-shrink-0">
-                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-surface-100 overflow-hidden shadow-lg shadow-primary-500/10">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-surface-100 overflow-hidden shadow-lg shadow-primary-500/10">
                       <img v-if="profile.photo" :src="`/storage/${profile.photo}`" :alt="$page.props.auth.user?.name" class="w-full h-full object-cover" />
-                      <div v-else class="w-full h-full flex items-center justify-center text-3xl">👨‍🏫</div>
+                      <div v-else class="w-full h-full flex items-center justify-center text-2xl md:text-3xl">👨‍🏫</div>
                     </div>
                   </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-4 mb-4">
-                      <div>
-                        <h3 class="text-2xl font-bold text-slate-900">{{ $page.props.auth.user?.name }}</h3>
+                  <div class="flex-1 min-w-0 w-full">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-3 mb-4">
+                      <div class="text-center sm:text-right w-full">
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900">{{ $page.props.auth.user?.name }}</h3>
 
-                        <!-- Status Badge - واضح وكبير -->
-                        <div class="mt-3 p-4 rounded-2xl border-2" :class="statusCardClass">
+                        <!-- Status Badge -->
+                        <div class="mt-3 p-3 md:p-4 rounded-2xl border-2 text-right" :class="statusCardClass">
                           <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center" :class="statusIconClass">
                               <svg v-if="profile.status === 'approved'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,16 +81,16 @@
                       </div>
                       <Link
                         href="/teacher-profile/edit"
-                        class="btn-ghost px-4 py-2 text-sm flex-shrink-0"
+                        class="btn-ghost px-3 md:px-4 py-2 text-xs md:text-sm flex-shrink-0"
                       >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                         {{ $t('messages.edit') }}
                       </Link>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                       <div class="p-3 rounded-xl bg-primary-50">
                         <p class="text-xs text-primary-600 font-semibold mb-0.5">{{ $t('messages.subject') }}</p>
                         <p class="text-sm font-bold text-slate-900">{{ profile.subject?.name || '-' }}</p>
@@ -109,9 +109,9 @@
                       </div>
                     </div>
 
-                    <div class="mt-4">
+                    <div class="mt-4 text-center sm:text-right">
                       <p class="text-xs text-slate-500 font-semibold mb-2">{{ $t('messages.grades_teaching') }}</p>
-                      <div class="flex flex-wrap gap-1.5">
+                      <div class="flex flex-wrap gap-1.5 justify-center sm:justify-start">
                         <span
                           v-for="grade in profile.grades"
                           :key="grade.id"
@@ -192,13 +192,13 @@
         </div>
       </div>
     </div>
-  </MainLayout>
+  </DashboardLayout>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
-import MainLayout from '@/Layouts/MainLayout.vue'
+import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 
 const page = usePage()
 const profile = computed(() => page.props.auth.user?.teacher_profile)

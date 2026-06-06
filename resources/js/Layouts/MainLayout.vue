@@ -78,6 +78,14 @@
               </div>
               <Link
                 v-if="$page.props.auth.user?.is_admin"
+                href="/admin/schools"
+                class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
+                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/SchoolsIndex' }"
+              >
+                المدارس
+              </Link>
+              <Link
+                v-if="$page.props.auth.user?.is_admin"
                 href="/admin/subjects"
                 class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
                 :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Subjects' }"
@@ -126,13 +134,24 @@
                 </Link>
               </template>
               <template v-else>
+                <template v-if="!$page.props.auth.user.is_admin">
                 <Link
-                  v-if="!$page.props.auth.user.is_admin && !$page.props.auth.user.teacher_profile"
+                  v-if="$page.props.auth.user.role === 'school' && !$page.props.auth.user.school_profile"
+                  href="/school-profile/create"
+                  class="btn-primary px-5 py-2 text-sm"
+                >
+                  إضافة بيانات المدرسة
+                </Link>
+                <Link
+                  v-else-if="$page.props.auth.user.role === 'teacher' && !$page.props.auth.user.teacher_profile"
                   href="/teacher-profile/create"
                   class="btn-primary px-5 py-2 text-sm"
                 >
                   {{ $t('navigation.add_profile') }}
                 </Link>
+              </template>
+                <!-- Notifications -->
+                <NotificationBell v-if="$page.props.auth.user" :unread-count="unreadCount" />
                 <div class="relative" v-if="$page.props.auth.user">
                   <button
                     @click="showMenu = !showMenu"
@@ -235,6 +254,13 @@
                       المرفوضون
                     </Link>
                   </div>
+                  <Link href="/admin/schools" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
+                    :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/SchoolsIndex' }">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    المدارس
+                  </Link>
                   <Link href="/admin/subjects" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
                     :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Subjects' }">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,10 +315,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { applyPrimaryColor } from '@/utils/colors'
+import NotificationBell from '@/Components/NotificationBell.vue'
+import { useNotifications } from '@/composables/useNotifications'
+
+const { unreadCount, startPolling, stopPolling } = useNotifications()
+
+onMounted(() => {
+  if (page.props.auth.user) startPolling()
+})
+onUnmounted(() => stopPolling())
 
 const { locale } = useI18n()
 const currentLocale = ref(locale.value)

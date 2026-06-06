@@ -1,5 +1,5 @@
 <template>
-  <MainLayout>
+  <DashboardLayout>
     <div>
       <!-- Header -->
       <div class="flex items-center justify-between mb-8 animate-fade-in-up">
@@ -110,13 +110,13 @@
         </div>
       </form>
     </div>
-  </MainLayout>
+  </DashboardLayout>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-import MainLayout from '@/Layouts/MainLayout.vue'
+import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
 import { applyPrimaryColor } from '@/utils/colors'
 

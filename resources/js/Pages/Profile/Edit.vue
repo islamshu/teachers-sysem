@@ -21,12 +21,12 @@
         <form @submit.prevent="updateProfile">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1.5">الاسم الكامل</label>
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">الاسم الكامل <span class="text-red-500">*</span></label>
               <input v-model="profileForm.name" type="text" class="input-base" required />
               <p v-if="profileForm.errors.name" class="text-red-500 text-xs mt-1">{{ profileForm.errors.name }}</p>
             </div>
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني</label>
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني <span class="text-red-500">*</span></label>
               <input v-model="profileForm.email" type="email" class="input-base" dir="ltr" required />
               <p v-if="profileForm.errors.email" class="text-red-500 text-xs mt-1">{{ profileForm.errors.email }}</p>
             </div>
@@ -51,17 +51,17 @@
         <form @submit.prevent="updatePassword">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور الحالية</label>
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور الحالية <span class="text-red-500">*</span></label>
               <input v-model="passwordForm.current_password" type="password" class="input-base" required />
               <p v-if="passwordForm.errors.current_password" class="text-red-500 text-xs mt-1">{{ passwordForm.errors.current_password }}</p>
             </div>
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور الجديدة</label>
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور الجديدة <span class="text-red-500">*</span></label>
               <input v-model="passwordForm.password" type="password" class="input-base" required />
               <p v-if="passwordForm.errors.password" class="text-red-500 text-xs mt-1">{{ passwordForm.errors.password }}</p>
             </div>
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1.5">تأكيد كلمة المرور</label>
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">تأكيد كلمة المرور <span class="text-red-500">*</span></label>
               <input v-model="passwordForm.password_confirmation" type="password" class="input-base" required />
             </div>
           </div>
@@ -84,7 +84,7 @@
 
         <form @submit.prevent="confirmDelete">
           <div class="max-w-md">
-            <label class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور لتأكيد الحذف</label>
+            <label class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور لتأكيد الحذف <span class="text-red-500">*</span></label>
             <input v-model="deleteForm.password" type="password" class="input-base" placeholder="أدخل كلمة المرور" required />
             <p v-if="deleteForm.errors.password" class="text-red-500 text-xs mt-1">{{ deleteForm.errors.password }}</p>
           </div>

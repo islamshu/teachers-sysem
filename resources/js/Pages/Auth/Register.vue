@@ -34,29 +34,71 @@
         <Alert v-if="form.errors.email" variant="error" title="خطأ" :description="form.errors.email" class="mb-6" />
         <Alert v-if="form.errors.password" variant="error" title="خطأ" :description="form.errors.password" class="mb-6" />
         <Alert v-if="form.errors.name" variant="error" title="خطأ" :description="form.errors.name" class="mb-6" />
+        <Alert v-if="form.errors.role" variant="error" title="خطأ" :description="form.errors.role" class="mb-6" />
 
         <form @submit.prevent="submit">
+          <!-- Role Selection -->
+          <div class="mb-6">
+            <label class="block text-sm font-bold text-slate-700 mb-3">نوع الحساب <span class="text-red-500">*</span></label>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                @click="form.role = 'teacher'"
+                class="relative flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200"
+                :class="form.role === 'teacher'
+                  ? 'border-primary-500 bg-primary-50 shadow-sm shadow-primary-500/10'
+                  : 'border-surface-200 hover:border-primary-200 hover:bg-surface-50'"
+              >
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                  :class="form.role === 'teacher' ? 'bg-primary-100' : 'bg-surface-100'">
+                  👨‍🏫
+                </div>
+                <span class="text-sm font-bold" :class="form.role === 'teacher' ? 'text-primary-700' : 'text-slate-700'">
+                  مدرس
+                </span>
+              </button>
+              <button
+                type="button"
+                @click="form.role = 'school'"
+                class="relative flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200"
+                :class="form.role === 'school'
+                  ? 'border-primary-500 bg-primary-50 shadow-sm shadow-primary-500/10'
+                  : 'border-surface-200 hover:border-primary-200 hover:bg-surface-50'"
+              >
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                  :class="form.role === 'school' ? 'bg-primary-100' : 'bg-surface-100'">
+                  🏫
+                </div>
+                <span class="text-sm font-bold" :class="form.role === 'school' ? 'text-primary-700' : 'text-slate-700'">
+                  مدرسة
+                </span>
+              </button>
+            </div>
+          </div>
+
           <!-- Name -->
           <div>
-            <label for="name" class="block text-sm font-bold text-slate-700 mb-1.5">الاسم الكامل</label>
-            <input id="name" v-model="form.name" type="text" class="input-base" placeholder="محمد أحمد" required autofocus autocomplete="name" />
+            <label for="name" class="block text-sm font-bold text-slate-700 mb-1.5">
+              {{ form.role === 'school' ? 'اسم المدرسة' : 'الاسم الكامل' }} <span class="text-red-500">*</span>
+            </label>
+            <input id="name" v-model="form.name" type="text" class="input-base" :placeholder="form.role === 'school' ? 'مدرسة الأندلس الأهلية' : 'محمد أحمد'" required autofocus autocomplete="name" />
           </div>
 
           <!-- Email -->
           <div class="mt-5">
-            <label for="email" class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني</label>
+            <label for="email" class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني <span class="text-red-500">*</span></label>
             <input id="email" v-model="form.email" type="email" class="input-base" placeholder="teacher@example.com" required autocomplete="username" />
           </div>
 
           <!-- Password -->
           <div class="mt-5">
-            <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور</label>
+            <label for="password" class="block text-sm font-bold text-slate-700 mb-1.5">كلمة المرور <span class="text-red-500">*</span></label>
             <input id="password" v-model="form.password" type="password" class="input-base" placeholder="********" required autocomplete="new-password" />
           </div>
 
           <!-- Confirm Password -->
           <div class="mt-5">
-            <label for="password_confirmation" class="block text-sm font-bold text-slate-700 mb-1.5">تأكيد كلمة المرور</label>
+            <label for="password_confirmation" class="block text-sm font-bold text-slate-700 mb-1.5">تأكيد كلمة المرور <span class="text-red-500">*</span></label>
             <input id="password_confirmation" v-model="form.password_confirmation" type="password" class="input-base" placeholder="********" required autocomplete="new-password" />
           </div>
 
@@ -95,6 +137,7 @@ const form = useForm({
   email: '',
   password: '',
   password_confirmation: '',
+  role: 'teacher',
 })
 
 const submit = () => {

@@ -1,5 +1,5 @@
 <template>
-  <MainLayout>
+  <DashboardLayout>
     <div>
       <!-- Header -->
       <div class="flex items-center justify-between mb-8 animate-fade-in-up">
@@ -17,9 +17,9 @@
       <Alert v-if="flash.message" variant="success" :title="flash.message" closeable class="mb-6 animate-fade-in-down" />
 
       <!-- Batch Actions Bar -->
-      <div v-if="selectedIds.size > 0" class="flex items-center gap-3 mb-4 p-4 rounded-2xl bg-white border border-surface-200 shadow-sm animate-fade-in-down">
+      <div v-if="selectedIds.size > 0" class="flex flex-wrap items-center gap-3 mb-4 p-4 rounded-2xl bg-white border border-surface-200 shadow-sm animate-fade-in-down">
         <span class="text-sm font-bold text-slate-700">{{ selectedIds.size }} مختار</span>
-        <div class="flex gap-2 mr-auto">
+        <div class="flex flex-wrap gap-2 mr-auto">
           <button @click="batchApprove" class="btn-primary text-sm px-4 py-2 bg-emerald-600 hover:bg-emerald-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -143,6 +143,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                     </button>
+                    <button
+                      @click="deleteTeacher(teacher.id)"
+                      class="p-2.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-lg hover:shadow-red-500/20 transition-all duration-200"
+                      title="حذف"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -173,14 +182,15 @@
         <p class="text-slate-500">{{ $t('messages.all_reviewed') }}</p>
       </div>
     </div>
-  </MainLayout>
+  </DashboardLayout>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import MainLayout from '@/Layouts/MainLayout.vue'
+import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   teachers: Array,
@@ -216,17 +226,39 @@ const toggleAll = () => {
 
 const batchApprove = () => {
   const ids = [...selectedIds.value]
-  if (!confirm(`هل تريد قبول ${ids.length} مدرس؟`)) return
-  useForm({ ids }).patch('/admin/teachers/batch/approve', {
-    onSuccess: () => location.reload()
+  Swal.fire({
+    icon: 'question',
+    title: `تأكيد القبول`,
+    text: `هل تريد قبول ${ids.length} مدرس؟`,
+    showCancelButton: true,
+    confirmButtonText: 'قبول',
+    cancelButtonText: 'إلغاء',
+    confirmButtonColor: '#10b981',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      useForm({ ids }).patch('/admin/teachers/batch/approve', {
+        onSuccess: () => location.reload()
+      })
+    }
   })
 }
 
 const batchReject = () => {
   const ids = [...selectedIds.value]
-  if (!confirm(`هل تريد رفض ${ids.length} مدرس؟`)) return
-  useForm({ ids }).patch('/admin/teachers/batch/reject', {
-    onSuccess: () => location.reload()
+  Swal.fire({
+    icon: 'question',
+    title: `تأكيد الرفض`,
+    text: `هل تريد رفض ${ids.length} مدرس؟`,
+    showCancelButton: true,
+    confirmButtonText: 'رفض',
+    cancelButtonText: 'إلغاء',
+    confirmButtonColor: '#ef4444',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      useForm({ ids }).patch('/admin/teachers/batch/reject', {
+        onSuccess: () => location.reload()
+      })
+    }
   })
 }
 
@@ -270,19 +302,57 @@ onUnmounted(() => {
 })
 
 const approveTeacher = (teacherId) => {
-  if (confirm(props.flash?.approve_confirm || 'هل تريد قبول هذا المدرس؟')) {
-    useForm({}).patch(`/admin/teachers/${teacherId}/approve`, {
-      onSuccess: () => location.reload()
-    })
-  }
+  Swal.fire({
+    icon: 'question',
+    title: 'تأكيد القبول',
+    text: 'هل تريد قبول هذا المدرس؟',
+    showCancelButton: true,
+    confirmButtonText: 'قبول',
+    cancelButtonText: 'إلغاء',
+    confirmButtonColor: '#10b981',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      useForm({}).patch(`/admin/teachers/${teacherId}/approve`, {
+        onSuccess: () => location.reload()
+      })
+    }
+  })
 }
 
 const rejectTeacher = (teacherId) => {
-  if (confirm(props.flash?.reject_confirm || 'هل تريد رفض هذا المدرس؟')) {
-    useForm({}).patch(`/admin/teachers/${teacherId}/reject`, {
-      onSuccess: () => location.reload()
-    })
-  }
+  Swal.fire({
+    icon: 'question',
+    title: 'تأكيد الرفض',
+    text: 'هل تريد رفض هذا المدرس؟',
+    showCancelButton: true,
+    confirmButtonText: 'رفض',
+    cancelButtonText: 'إلغاء',
+    confirmButtonColor: '#ef4444',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      useForm({}).patch(`/admin/teachers/${teacherId}/reject`, {
+        onSuccess: () => location.reload()
+      })
+    }
+  })
+}
+
+const deleteTeacher = (teacherId) => {
+  Swal.fire({
+    icon: 'warning',
+    title: 'حذف المدرس',
+    text: 'سيتم حذف جميع بيانات المدرس والمستخدم المرتبط به نهائياً. لا يمكن التراجع عن هذا الإجراء.',
+    showCancelButton: true,
+    confirmButtonText: 'نعم، احذف',
+    cancelButtonText: 'إلغاء',
+    confirmButtonColor: '#ef4444',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      useForm({}).delete(`/admin/teachers/${teacherId}`, {
+        onSuccess: () => location.reload()
+      })
+    }
+  })
 }
 
 const viewTeacher = (teacherId) => {

@@ -95,10 +95,11 @@
 
       <!-- Teachers Grid -->
       <div v-if="teachersList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
+        <Link
           v-for="(teacher, index) in teachersList"
           :key="teacher.id"
-          class="group card-hover overflow-hidden animate-fade-in-up"
+          :href="`/teachers/${teacher.id}`"
+          class="group card-hover overflow-hidden animate-fade-in-up block"
           :style="{ animationDelay: `${(index % 6) * 0.1}s` }"
         >
           <!-- Photo -->
@@ -118,13 +119,27 @@
             <!-- Gradient overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-            <!-- Badge -->
-            <div class="absolute top-3 left-3">
+            <!-- Watermark for employed teachers -->
+            <div v-if="teacher.employment_status === 'employed'" class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+              <span class="text-4xl font-extrabold text-white/30 -rotate-[30deg] tracking-wider uppercase">موظف حالياً</span>
+            </div>
+
+            <!-- Badges -->
+            <div class="absolute top-3 left-3 flex flex-col gap-2">
               <span class="badge-success shadow-lg shadow-emerald-500/20">
                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
                 {{ $t('messages.approved') }}
+              </span>
+              <span
+                v-if="teacher.employment_status === 'employed'"
+                class="badge bg-amber-500 text-white shadow-lg shadow-amber-500/20 text-xs"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                موظف حالياً
               </span>
             </div>
           </div>
@@ -196,21 +211,8 @@
             <p v-if="teacher.bio" class="mt-4 text-sm text-slate-500 line-clamp-2 leading-relaxed">
               {{ teacher.bio }}
             </p>
-
-            <!-- Actions -->
-            <div class="mt-5 pt-4 border-t border-surface-100">
-              <a
-                :href="`tel:${teacher.phone}`"
-                class="btn-primary w-full text-sm"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                {{ $t('messages.contact_teacher') }}
-              </a>
-            </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       <!-- Loading / Sentinel -->
@@ -247,6 +249,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { Link } from '@inertiajs/vue3'
 import MainLayout from '@/Layouts/MainLayout.vue'
 
 const props = defineProps({

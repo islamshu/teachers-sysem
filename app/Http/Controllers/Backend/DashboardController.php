@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Grade;
+use App\Models\SchoolProfile;
 use App\Models\Subject;
 use App\Models\TeacherProfile;
+use App\Models\User;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -17,6 +19,9 @@ class DashboardController extends Controller
             'approved' => TeacherProfile::where('status', 'approved')->count(),
             'rejected' => TeacherProfile::where('status', 'rejected')->count(),
             'total' => TeacherProfile::count(),
+            'schools_pending' => SchoolProfile::where('status', 'pending')->count(),
+            'schools_approved' => SchoolProfile::where('status', 'approved')->count(),
+            'schools_total' => SchoolProfile::count(),
         ];
 
         $recentPending = TeacherProfile::with(['user', 'subject'])

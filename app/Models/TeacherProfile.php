@@ -17,8 +17,10 @@ class TeacherProfile extends Model
         'residence_place',
         'current_location',
         'qualification',
+        'practical_experience',
         'bio',
         'status',
+        'employment_status',
     ];
 
     public function user()
@@ -34,5 +36,15 @@ class TeacherProfile extends Model
     public function grades()
     {
         return $this->belongsToMany(Grade::class);
+    }
+
+    public function employments()
+    {
+        return $this->hasMany(Employment::class, 'teacher_id');
+    }
+
+    public function activeEmployment()
+    {
+        return $this->hasOne(Employment::class, 'teacher_id')->where('status', 'hired');
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Backend\BusContractController as AdminBusContractController;
+use App\Http\Controllers\Backend\ContractAttachmentController;
 use App\Http\Controllers\Backend\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Backend\LookupController;
 use App\Http\Controllers\Backend\SchoolController;
 use App\Http\Controllers\Backend\SettingsController;
 use App\Http\Controllers\Backend\TeacherController;
 use App\Http\Controllers\Backend\UserController;
+use App\Http\Controllers\Frontend\BusContractController;
 use App\Http\Controllers\Frontend\TeacherController as FrontendTeacherController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\School\EmploymentController as SchoolEmploymentController;
@@ -27,6 +30,12 @@ Route::get('/teachers', function () {
 // Public teacher profile
 Route::get('/teachers/{teacher}', [FrontendTeacherController::class, 'show'])
     ->name('teachers.show');
+
+// Bus contracts
+Route::get('/bus-contracts/create', [BusContractController::class, 'create'])
+    ->name('bus-contracts.create');
+Route::post('/bus-contracts', [BusContractController::class, 'store'])
+    ->name('bus-contracts.store');
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
@@ -152,6 +161,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings', [SettingsController::class, 'update'])
             ->name('settings.update');
 
+        // Bus contracts
+        Route::get('/bus-contracts', [AdminBusContractController::class, 'index'])
+            ->name('bus-contracts.index');
+        Route::get('/bus-contracts/{contract}', [AdminBusContractController::class, 'show'])
+            ->name('bus-contracts.show');
+        Route::delete('/bus-contracts/{contract}', [AdminBusContractController::class, 'destroy'])
+            ->name('bus-contracts.destroy');
+
         // Subjects management
         Route::get('/subjects', [LookupController::class, 'subjects'])
             ->name('subjects.index');
@@ -171,6 +188,18 @@ Route::middleware('auth')->group(function () {
             ->name('grades.update');
         Route::delete('/grades/{grade}', [LookupController::class, 'destroyGrade'])
             ->name('grades.destroy');
+
+        // Contract attachments
+        Route::get('/contract-attachments', [ContractAttachmentController::class, 'index'])
+            ->name('contract-attachments.index');
+        Route::post('/contract-attachments', [ContractAttachmentController::class, 'store'])
+            ->name('contract-attachments.store');
+        Route::put('/contract-attachments/{contractAttachment}', [ContractAttachmentController::class, 'update'])
+            ->name('contract-attachments.update');
+        Route::post('/contract-attachments/{contractAttachment}/toggle', [ContractAttachmentController::class, 'toggle'])
+            ->name('contract-attachments.toggle');
+        Route::delete('/contract-attachments/{contractAttachment}', [ContractAttachmentController::class, 'destroy'])
+            ->name('contract-attachments.destroy');
 
         // Schools management
         Route::get('/schools/create', [SchoolController::class, 'create'])

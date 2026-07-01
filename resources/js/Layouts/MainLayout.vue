@@ -40,6 +40,13 @@
                 {{ $t('navigation.home') }}
               </Link>
               <Link
+                href="/bus-contracts/create"
+                class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
+                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'BusContracts/Create' }"
+              >
+                عقود الباصات
+              </Link>
+              <Link
                 v-if="$page.props.auth.user"
                 href="/dashboard"
                 class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
@@ -48,66 +55,6 @@
                 {{ $t('navigation.dashboard') }}
               </Link>
               
-              <!-- Teachers Dropdown -->
-              <div v-if="$page.props.auth.user?.is_admin" class="relative">
-                <button
-                  @click="teachersDropdown = !teachersDropdown"
-                  class="flex items-center gap-1 px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
-                  :class="{ 'text-primary-700 bg-primary-50': showTeachersActive }"
-                >
-                  المدرسون
-                  <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': teachersDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div v-if="teachersDropdown" @click="teachersDropdown = false" class="fixed inset-0 z-10"></div>
-                <div
-                  v-if="teachersDropdown"
-                  class="absolute top-full mt-1 right-0 w-52 z-20 glass rounded-2xl shadow-xl border border-surface-200/50 py-2 animate-fade-in-down"
-                >
-                  <Link href="/admin/teachers?status=pending" @click="teachersDropdown = false" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                    قيد المراجعة
-                  </Link>
-                  <Link href="/admin/teachers?status=approved" @click="teachersDropdown = false" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                    المقبولون
-                  </Link>
-                  <Link href="/admin/teachers?status=rejected" @click="teachersDropdown = false" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                    المرفوضون
-                  </Link>
-                </div>
-              </div>
-              <Link
-                v-if="$page.props.auth.user?.is_admin"
-                href="/admin/schools"
-                class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
-                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/SchoolsIndex' }"
-              >
-                المدارس
-              </Link>
-              <Link
-                v-if="$page.props.auth.user?.is_admin"
-                href="/admin/subjects"
-                class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
-                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Subjects' }"
-              >
-                المواد
-              </Link>
-              <Link
-                v-if="$page.props.auth.user?.is_admin"
-                href="/admin/grades"
-                class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
-                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Grades' }"
-              >
-                الصفوف
-              </Link>
-              <Link
-                v-if="$page.props.auth.user?.is_admin"
-                href="/admin/settings"
-                class="px-4 py-2 rounded-xl font-medium text-slate-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
-                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Settings' }"
-              >
-                الإعدادات
-              </Link>
             </nav>
 
             <!-- Mobile Hamburger -->
@@ -215,6 +162,15 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 {{ $t('navigation.home') }}
+              </Link>
+
+              <Link href="/bus-contracts/create" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
+                :class="{ 'text-primary-700 bg-primary-50': $page.component === 'BusContracts/Create' }">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                </svg>
+                عقود الباصات
               </Link>
 
               <template v-if="$page.props.auth.user">

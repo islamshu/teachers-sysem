@@ -8,6 +8,7 @@ use App\Models\SchoolProfile;
 use App\Models\Subject;
 use App\Models\TeacherProfile;
 use App\Models\User;
+use App\Models\BusContract;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -26,6 +27,7 @@ class DashboardController extends Controller
             'users_teachers' => User::where('role', 'teacher')->count(),
             'users_schools' => User::where('role', 'school')->count(),
             'users_admins' => User::where('role', 'admin')->count(),
+            'bus_contracts' => BusContract::count(),
         ];
 
         $recentPending = TeacherProfile::with(['user', 'subject'])
@@ -33,6 +35,8 @@ class DashboardController extends Controller
             ->latest()
             ->take(5)
             ->get();
+
+        $busContracts = BusContract::latest()->get();
 
         $allTeachersQuery = TeacherProfile::with(['user', 'subject', 'grades'])
             ->latest();
@@ -53,6 +57,7 @@ class DashboardController extends Controller
             'grades' => $grades,
             'allTeachers' => $allTeachers->items(),
             'allTeachersNextPage' => $allTeachers->currentPage() < $allTeachers->lastPage() ? $allTeachers->currentPage() + 1 : null,
+            'busContracts' => $busContracts,
         ]);
     }
 }

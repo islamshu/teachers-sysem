@@ -236,6 +236,33 @@
               <div class="border-t border-surface-200 my-3"></div>
 
               <Link
+                href="/admin/bus-contracts"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/bus-contracts') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/bus-contracts') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                  </svg>
+                </div>
+                <span>عقود الباصات</span>
+              </Link>
+
+              <Link
+                href="/admin/contract-attachments"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/contract-attachments') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/contract-attachments') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                </div>
+                <span>مرفقات العقود</span>
+              </Link>
+
+              <Link
                 href="/admin/settings"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
                 :class="isActive('/admin/settings') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"

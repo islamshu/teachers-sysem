@@ -348,6 +348,79 @@
           <p v-else-if="!allTeachersNextPage && allTeachersList.length > 0" class="text-sm text-slate-400">لا يوجد المزيد</p>
         </div>
       </div>
+
+      <!-- Bus Contracts -->
+      <div class="card mb-8 animate-fade-in-up animate-delay-300">
+        <div class="p-6 border-b border-surface-200 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900">عقود الباصات</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <Link href="/bus-contracts/create" class="btn-primary text-sm px-4 py-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              إضافة عقد
+            </Link>
+            <div class="text-sm font-semibold text-slate-500">{{ busContracts.length }} عقد</div>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-surface-50 border-b border-surface-200">
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">#</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">المالك</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">هاتف المالك</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">السائق</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">هاتف السائق</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">الرخصة</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">اللون</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">الركاب</th>
+                <th class="px-4 py-3 text-right text-sm font-bold text-slate-700">الموقع</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-100">
+              <tr
+                v-for="(contract, index) in busContracts"
+                :key="contract.id"
+                class="hover:bg-primary-50/50 transition-colors duration-150"
+              >
+                <td class="px-4 py-3 text-sm text-slate-500">{{ index + 1 }}</td>
+                <td class="px-4 py-3 text-sm font-bold text-slate-900">{{ contract.owner_name }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700" dir="ltr">{{ contract.owner_phone || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ contract.same_driver ? 'نفس المالك' : contract.driver_name || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700" dir="ltr">{{ contract.same_driver ? '-' : contract.driver_phone || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ contract.license }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">
+                  <div class="flex items-center gap-2">
+                    <span class="inline-block w-4 h-4 rounded-full border border-surface-200" :style="{ backgroundColor: contract.van_color }"></span>
+                    <span>{{ contract.van_color }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-sm font-bold text-slate-900 text-center">{{ contract.seats_count }}</td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ contract.location }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-if="busContracts.length === 0" class="p-10 text-center">
+          <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-1">لا توجد عقود باصات</h3>
+          <p class="text-sm text-slate-500">لم يتم إضافة أي عقود باصات بعد</p>
+        </div>
+      </div>
     </div>
   </DashboardLayout>
 </template>
@@ -364,6 +437,7 @@ const props = defineProps({
   grades: Array,
   allTeachers: Array,
   allTeachersNextPage: Number,
+  busContracts: Array,
 })
 
 const allTeachersList = ref([...props.allTeachers])

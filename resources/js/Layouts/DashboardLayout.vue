@@ -457,17 +457,27 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import NotificationBell from '@/Components/NotificationBell.vue'
 import { useNotifications } from '@/composables/useNotifications'
+import { useFlashAlert } from '@/composables/useFlashAlert'
+import { applyPrimaryColor } from '@/utils/colors'
 
 const { unreadCount, startPolling, stopPolling } = useNotifications()
 
-onMounted(() => startPolling())
+const page = usePage()
+
+useFlashAlert()
+
+onMounted(() => {
+  startPolling()
+  const color = page.props.settings?.primary_color
+  if (color) {
+    applyPrimaryColor(color)
+  }
+})
 onUnmounted(() => stopPolling())
 
 const showMenu = ref(false)
 const sidebarOpen = ref(false)
 const openSubmenu = ref('teachers')
-
-const page = usePage()
 
 const teachersActive = computed(() =>
   ['Admin/TeachersIndex', 'Admin/TeacherDetails'].includes(page.component)

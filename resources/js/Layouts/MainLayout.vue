@@ -321,8 +321,11 @@ import { useI18n } from 'vue-i18n'
 import { applyPrimaryColor } from '@/utils/colors'
 import NotificationBell from '@/Components/NotificationBell.vue'
 import { useNotifications } from '@/composables/useNotifications'
+import { useFlashAlert } from '@/composables/useFlashAlert'
 
 const { unreadCount, startPolling, stopPolling } = useNotifications()
+
+useFlashAlert()
 
 onMounted(() => {
   if (page.props.auth.user) startPolling()

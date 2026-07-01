@@ -33,7 +33,7 @@ class EmploymentController extends Controller
     {
         $teacher = Auth::user()->teacherProfile;
 
-        if ($employment->teacher_id !== $teacher->id) {
+        if ((int) $employment->teacher_id !== (int) $teacher->id) {
             abort(403);
         }
 
@@ -52,7 +52,7 @@ class EmploymentController extends Controller
     {
         $teacher = Auth::user()->teacherProfile;
 
-        if ($employment->teacher_id !== $teacher->id) {
+        if ((int) $employment->teacher_id !== (int) $teacher->id) {
             abort(403);
         }
 

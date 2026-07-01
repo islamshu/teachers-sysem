@@ -110,7 +110,7 @@ class EmploymentController extends Controller
 
     public function markInterviewed(Employment $employment)
     {
-        if ($employment->school_id !== Auth::id()) {
+        if ((int) $employment->school_id !== (int) Auth::id()) {
             abort(403);
         }
 
@@ -125,7 +125,7 @@ class EmploymentController extends Controller
 
     public function hire(Employment $employment)
     {
-        if ($employment->school_id !== Auth::id()) {
+        if ((int) $employment->school_id !== (int) Auth::id()) {
             abort(403);
         }
 
@@ -153,7 +153,7 @@ class EmploymentController extends Controller
 
     public function reject(Employment $employment)
     {
-        if ($employment->school_id !== Auth::id()) {
+        if ((int) $employment->school_id !== (int) Auth::id()) {
             abort(403);
         }
 
@@ -181,7 +181,7 @@ class EmploymentController extends Controller
 
     public function endEmployment(Employment $employment)
     {
-        if ($employment->school_id !== Auth::id()) {
+        if ((int) $employment->school_id !== (int) Auth::id()) {
             abort(403);
         }
 

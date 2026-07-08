@@ -24,11 +24,11 @@ class TeacherInvited extends Notification
 
     public function toArray(object $notifiable): array
     {
-        $school = $this->employment->school->schoolProfile;
+        $schoolName = $this->employment->school?->schoolProfile?->school_name ?? $this->employment->school?->name ?? 'مدرسة';
 
         return [
             'title' => 'دعوة توظيف جديدة',
-            'body' => "{$school->school_name} تدعوك للانضمام إليها",
+            'body' => "{$schoolName} تدعوك للانضمام إليها",
             'url' => route('teacher.invitations'),
             'employment_id' => $this->employment->id,
         ];

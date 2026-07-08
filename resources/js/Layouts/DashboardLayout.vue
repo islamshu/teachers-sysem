@@ -85,14 +85,14 @@
     <div class="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
       <!-- Sidebar -->
       <aside
-        class="w-64 flex-shrink-0"
+        class="w-64 flex-shrink-0 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]"
         :class="sidebarOpen ? 'fixed inset-0 z-40 lg:relative lg:inset-auto' : 'hidden lg:block'"
       >
         <!-- Mobile backdrop -->
         <div v-if="sidebarOpen" class="fixed inset-0 bg-black/30 backdrop-blur-sm lg:hidden" @click="sidebarOpen = false"></div>
 
         <div
-          class="relative bg-white rounded-2xl shadow-sm border border-surface-200 p-4 h-full lg:h-auto overflow-y-auto"
+          class="relative bg-white rounded-2xl shadow-sm border border-surface-200 p-4 h-full overflow-y-auto"
           :class="sidebarOpen ? 'w-72 max-w-[85vw] mt-4 mr-4' : ''"
         >
           <!-- Close button mobile -->
@@ -263,6 +263,20 @@
               </Link>
 
               <Link
+                v-if="$page.props.auth.permissions?.includes('إدارة المشتريات')"
+                href="/admin/purchases"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/purchases') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/purchases') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                </div>
+                <span>المشتريات</span>
+              </Link>
+
+              <Link
                 href="/admin/settings"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
                 :class="isActive('/admin/settings') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
@@ -274,6 +288,151 @@
                   </svg>
                 </div>
                 <span>الإعدادات</span>
+              </Link>
+
+              <div class="border-t border-surface-200 my-3"></div>
+
+              <Link
+                href="/admin/roles"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/roles') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/roles') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <span>الأدوار والصلاحيات</span>
+              </Link>
+
+              <Link
+                href="/admin/branches"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/branches') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/branches') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                  </svg>
+                </div>
+                <span>الفروع</span>
+              </Link>
+
+              <Link
+                href="/admin/employees"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/employees') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/employees') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span>الموظفون</span>
+              </Link>
+
+              <Link
+                href="/admin/interview-questions"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/admin/interview-questions') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/admin/interview-questions') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                </div>
+                <span>أسئلة المقابلات</span>
+              </Link>
+
+              <div class="border-t border-surface-200 my-3"></div>
+
+              <!-- Tasks submenu -->
+              <div>
+                <button
+                  @click="toggleSubmenu('tasks')"
+                  class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="tasksActive ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="tasksActive ? 'bg-primary-100' : 'bg-surface-100'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                    </div>
+                    <span>المهام</span>
+                  </div>
+                  <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': openSubmenu === 'tasks' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSubmenu === 'tasks'" class="mr-4 mt-1 space-y-1 border-r-2 border-primary-200 pr-3">
+                  <Link
+                    href="/admin/fixed-tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/admin/fixed-tasks') && !isActive('/admin/fixed-tasks/progress') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-primary-500"></span>
+                    المهام اليومية
+                  </Link>
+                  <Link
+                    href="/admin/general-tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/admin/general-tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    المهام العامة
+                  </Link>
+                  <Link
+                    href="/admin/fixed-tasks/progress"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/admin/fixed-tasks/progress') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    تقرير التقدم
+                  </Link>
+                </div>
+              </div>
+
+              <div class="border-t border-surface-200 my-3"></div>
+              <p class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">التوظيف</p>
+
+              <Link
+                href="/school/teachers"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/school/teachers') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/teachers') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <span>تصفح المدرسين</span>
+              </Link>
+
+              <Link
+                href="/school/invitations"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/school/invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/invitations') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span>الدعوات المرسلة</span>
+              </Link>
+
+              <Link
+                href="/school/employees"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/school/employees') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employees') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span>المدرسون المعينون</span>
               </Link>
             </nav>
           </template>
@@ -378,6 +537,173 @@
                   <span>المدرسون المعينون</span>
                 </Link>
               </template>
+
+              <div class="border-t border-surface-200 my-3"></div>
+
+              <!-- Tasks submenu -->
+              <div>
+                <button
+                  @click="toggleSubmenu('tasks')"
+                  class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="tasksActive ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="tasksActive ? 'bg-primary-100' : 'bg-surface-100'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                    </div>
+                    <span>المهام</span>
+                  </div>
+                  <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': openSubmenu === 'tasks' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSubmenu === 'tasks'" class="mr-4 mt-1 space-y-1 border-r-2 border-primary-200 pr-3">
+                  <Link
+                    href="/tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-primary-500"></span>
+                    مهامي اليومية
+                  </Link>
+                  <Link
+                    href="/general-tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/general-tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    المهام العامة
+                  </Link>
+                </div>
+              </div>
+            </nav>
+          </template>
+
+          <!-- Employee Navigation -->
+          <template v-else-if="$page.props.auth.user?.role === 'employee'">
+            <div class="mb-6">
+              <div class="flex items-center gap-3 px-3 py-3 mb-2">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-sm">
+                  👤
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-slate-900">لوحة الموظف</p>
+                  <p class="text-xs text-slate-500">مرحباً، {{ $page.props.auth.user?.name }}</p>
+                </div>
+              </div>
+            </div>
+
+            <nav class="space-y-1">
+              <Link
+                href="/dashboard"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/dashboard') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/dashboard') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </div>
+                <span>لوحة التحكم</span>
+              </Link>
+
+              <Link
+                href="/employee/purchases"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/employee/purchases') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/employee/purchases') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                </div>
+                <span>طلبات الشراء</span>
+              </Link>
+
+              <div class="border-t border-surface-200 my-3"></div>
+              <p class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">التوظيف</p>
+
+              <Link
+                href="/school/teachers"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/school/teachers') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/teachers') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <span>تصفح المدرسين</span>
+              </Link>
+
+              <Link
+                href="/school/invitations"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/school/invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/invitations') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span>الدعوات المرسلة</span>
+              </Link>
+
+              <Link
+                href="/school/employees"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/school/employees') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employees') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span>المدرسون المعينون</span>
+              </Link>
+
+              <div class="border-t border-surface-200 my-3"></div>
+
+              <!-- Tasks submenu -->
+              <div>
+                <button
+                  @click="toggleSubmenu('tasks')"
+                  class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="tasksActive ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="tasksActive ? 'bg-primary-100' : 'bg-surface-100'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                    </div>
+                    <span>المهام</span>
+                  </div>
+                  <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': openSubmenu === 'tasks' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSubmenu === 'tasks'" class="mr-4 mt-1 space-y-1 border-r-2 border-primary-200 pr-3">
+                  <Link
+                    href="/tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-primary-500"></span>
+                    مهامي اليومية
+                  </Link>
+                  <Link
+                    href="/general-tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/general-tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    المهام العامة
+                  </Link>
+                </div>
+              </div>
             </nav>
           </template>
 
@@ -466,6 +792,47 @@
                 </div>
                 <span>جهة عملي</span>
               </Link>
+
+              <div class="border-t border-surface-200 my-3"></div>
+
+              <!-- Tasks submenu -->
+              <div>
+                <button
+                  @click="toggleSubmenu('tasks')"
+                  class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="tasksActive ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="tasksActive ? 'bg-primary-100' : 'bg-surface-100'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                    </div>
+                    <span>المهام</span>
+                  </div>
+                  <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': openSubmenu === 'tasks' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSubmenu === 'tasks'" class="mr-4 mt-1 space-y-1 border-r-2 border-primary-200 pr-3">
+                  <Link
+                    href="/tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-primary-500"></span>
+                    مهامي اليومية
+                  </Link>
+                  <Link
+                    href="/general-tasks"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    :class="isActive('/general-tasks') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    المهام العامة
+                  </Link>
+                </div>
+              </div>
             </nav>
           </template>
         </div>
@@ -508,6 +875,10 @@ const openSubmenu = ref('teachers')
 
 const teachersActive = computed(() =>
   ['Admin/TeachersIndex', 'Admin/TeacherDetails'].includes(page.component)
+)
+
+const tasksActive = computed(() =>
+  ['Admin/FixedTasks/Index', 'Admin/GeneralTasks/Index', 'Admin/FixedTasks/Progress', 'Tasks/Index', 'GeneralTasks/Index'].includes(page.component)
 )
 
 const isActive = (href) => {

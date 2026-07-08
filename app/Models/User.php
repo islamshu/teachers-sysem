@@ -10,17 +10,19 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'role', 'password'])]
+#[Fillable(['name', 'email', 'role', 'password', 'school_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     const ROLE_TEACHER = 'teacher';
     const ROLE_SCHOOL = 'school';
     const ROLE_ADMIN = 'admin';
+    const ROLE_EMPLOYEE = 'employee';
 
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     protected function casts(): array
     {
@@ -47,6 +49,16 @@ class User extends Authenticatable
         return $this->role === self::ROLE_SCHOOL;
     }
 
+    public function isEmployee(): bool
+    {
+        return $this->role === self::ROLE_EMPLOYEE;
+    }
+
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class)->withTimestamps();
+    }
+
     public function teacherProfile()
     {
         return $this->hasOne(TeacherProfile::class);
@@ -65,5 +77,20 @@ class User extends Authenticatable
     public function hiredEmployments()
     {
         return $this->hasMany(Employment::class, 'school_id')->where('status', 'hired');
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(User::class, 'school_id');
+    }
+
+    public function purchases()
+    {
+        return $this->belongsToMany(Purchase::class, 'purchase_user')->withTimestamps();
+    }
+
+    public function effectiveSchoolId(): int
+    {
+        return $this->school_id ?? $this->id;
     }
 }

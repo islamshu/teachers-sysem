@@ -72,7 +72,10 @@
 
       <!-- Users Table -->
       <div class="card animate-fade-in-up animate-delay-200">
-        <div v-if="usersList.length > 0" class="overflow-x-auto">
+        <div v-if="usersList.length > 0 || search" class="overflow-x-auto">
+          <div class="p-6 border-b border-surface-200 flex items-center justify-between">
+            <TableSearch v-model="search" />
+          </div>
           <table class="w-full">
             <thead>
               <tr class="bg-surface-50 border-b border-surface-200">
@@ -85,7 +88,7 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr
-                v-for="user in usersList"
+                v-for="user in filteredList"
                 :key="user.id"
                 class="hover:bg-primary-50/50 transition-colors duration-150"
               >
@@ -111,20 +114,34 @@
                 </td>
                 <td class="px-6 py-4 text-sm text-slate-600">{{ formatDate(user.created_at) }}</td>
                 <td class="px-6 py-4 text-center">
-                  <button
-                    @click="deleteUser(user)"
-                    class="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-all duration-200"
-                    title="حذف"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                  <div class="flex items-center justify-center gap-2">
+                    <Link
+                      :href="`/admin/users/${user.id}/roles`"
+                      class="p-2 rounded-lg bg-primary-100 text-primary-700 hover:bg-primary-200 transition-all duration-200"
+                      title="إدارة الأدوار"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </Link>
+                    <button
+                      @click="deleteUser(user)"
+                      class="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-all duration-200"
+                      title="حذف"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                </tr>
+                <tr v-if="filteredList.length === 0">
+                  <td colspan="5" class="px-6 py-12 text-center text-slate-500">لا توجد نتائج للبحث</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
         <div v-else class="p-10 text-center">
           <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
@@ -151,9 +168,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
+import TableSearch from '@/Components/TableSearch.vue'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -168,6 +186,24 @@ const nextPage = ref(props.nextPage)
 const loading = ref(false)
 const sentinel = ref(null)
 let observer = null
+const search = ref('')
+
+const matchesSearch = (item, term) => {
+  if (!term) return true
+  const t = term.toLowerCase()
+  return Object.values(item).some(val => {
+    if (val == null) return false
+    if (typeof val === 'string') return val.toLowerCase().includes(t)
+    if (typeof val === 'number') return String(val).includes(t)
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.some(v => typeof v === 'object' ? matchesSearch(v, term) : String(v).toLowerCase().includes(t))
+      return matchesSearch(val, term)
+    }
+    return false
+  })
+}
+
+const filteredList = computed(() => usersList.value.filter(item => matchesSearch(item, search.value)))
 
 const roleBadgeClass = (role) => {
   const map = {

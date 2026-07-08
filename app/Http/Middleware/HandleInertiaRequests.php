@@ -22,6 +22,8 @@ class HandleInertiaRequests extends Middleware
         if ($user) {
             if ($user->isSchool()) {
                 $user->load('schoolProfile');
+            } elseif ($user->isEmployee()) {
+                $user->load('branches', 'roles', 'school');
             } else {
                 $user->load('teacherProfile.subject', 'teacherProfile.grades');
             }
@@ -31,6 +33,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $user,
+                'permissions' => $user ? $user->getAllPermissions()->pluck('name') : [],
             ],
             'locale' => session('locale', 'ar'),
             'flash' => [

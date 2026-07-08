@@ -62,7 +62,10 @@
 
       <!-- Schools List -->
       <div class="card animate-fade-in-up animate-delay-200">
-        <div v-if="schools.length > 0" class="overflow-x-auto">
+        <div v-if="schools.length > 0 || search" class="overflow-x-auto">
+          <div class="p-6 border-b border-surface-200 flex items-center justify-between">
+            <TableSearch v-model="search" />
+          </div>
           <table class="w-full">
             <thead>
               <tr class="bg-surface-50 border-b border-surface-200">
@@ -76,7 +79,7 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr
-                v-for="school in schools"
+                v-for="school in filteredList"
                 :key="school.id"
                 class="hover:bg-primary-50/50 transition-colors duration-150"
               >
@@ -142,10 +145,13 @@
                     </button>
                   </div>
                 </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                </tr>
+                <tr v-if="filteredList.length === 0">
+                  <td colspan="6" class="px-6 py-12 text-center text-slate-500">لا توجد نتائج للبحث</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
         <div v-else class="p-10 text-center">
           <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
@@ -176,6 +182,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
+import TableSearch from '@/Components/TableSearch.vue'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -189,6 +196,24 @@ const nextPage = ref(props.nextPage)
 const loading = ref(false)
 const sentinel = ref(null)
 let observer = null
+const search = ref('')
+
+const matchesSearch = (item, term) => {
+  if (!term) return true
+  const t = term.toLowerCase()
+  return Object.values(item).some(val => {
+    if (val == null) return false
+    if (typeof val === 'string') return val.toLowerCase().includes(t)
+    if (typeof val === 'number') return String(val).includes(t)
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.some(v => typeof v === 'object' ? matchesSearch(v, term) : String(v).toLowerCase().includes(t))
+      return matchesSearch(val, term)
+    }
+    return false
+  })
+}
+
+const filteredList = computed(() => schoolsList.value.filter(item => matchesSearch(item, search.value)))
 
 const allCount = computed(() => schoolsList.value.length)
 

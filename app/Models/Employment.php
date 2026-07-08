@@ -38,4 +38,9 @@ class Employment extends Model
     {
         return $this->belongsTo(Subject::class);
     }
+
+    public function interview()
+    {
+        return $this->hasOne(Interview::class);
+    }
 }

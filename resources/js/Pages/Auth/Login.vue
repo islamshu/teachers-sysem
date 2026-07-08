@@ -32,7 +32,7 @@
         </div>
 
         <Alert v-if="status" variant="success" :title="status" class="mb-6" />
-        <Alert v-if="form.errors.email" variant="error" title="خطأ" :description="form.errors.email" class="mb-6" />
+        <Alert v-if="form.errors.email" variant="error" title="كلمة المرور او البريد الإلكتروني غير صحيح" :description="form.errors.email" class="mb-6" />
 
         <form @submit.prevent="submit">
           <!-- Email -->

@@ -48,6 +48,9 @@
 
       <!-- Teachers Table -->
       <div class="card overflow-hidden animate-fade-in-up animate-delay-100">
+        <div class="p-6 border-b border-surface-200 flex items-center justify-between">
+          <TableSearch v-model="search" />
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
@@ -71,7 +74,7 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr
-                v-for="teacher in teachersList"
+                v-for="teacher in filteredList"
                 :key="teacher.id"
                 class="hover:bg-primary-50/50 transition-colors duration-150"
                 :class="{ 'bg-primary-50/50': selectedIds.has(teacher.id) }"
@@ -166,6 +169,9 @@
                   </div>
                 </td>
               </tr>
+              <tr v-if="filteredList.length === 0 && search">
+                <td colspan="8" class="px-6 py-12 text-center text-slate-500">لا توجد نتائج للبحث</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -201,6 +207,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
+import TableSearch from '@/Components/TableSearch.vue'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -213,6 +220,24 @@ const props = defineProps({
 const teachersList = ref([...props.teachers])
 const nextPage = ref(props.nextPage)
 const loading = ref(false)
+const search = ref('')
+
+const matchesSearch = (item, term) => {
+  if (!term) return true
+  const t = term.toLowerCase()
+  return Object.values(item).some(val => {
+    if (val == null) return false
+    if (typeof val === 'string') return val.toLowerCase().includes(t)
+    if (typeof val === 'number') return String(val).includes(t)
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.some(v => typeof v === 'object' ? matchesSearch(v, term) : String(v).toLowerCase().includes(t))
+      return matchesSearch(val, term)
+    }
+    return false
+  })
+}
+
+const filteredList = computed(() => teachersList.value.filter(item => matchesSearch(item, search.value)))
 
 const totalCount = computed(() => teachersList.value.length)
 

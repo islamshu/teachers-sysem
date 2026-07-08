@@ -13,7 +13,7 @@ class TeacherMiddleware
             abort(403);
         }
 
-        if (!auth()->user()->isTeacher()) {
+        if (!auth()->user()->hasRole('teacher')) {
             abort(403);
         }
 

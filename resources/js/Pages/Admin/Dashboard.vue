@@ -269,7 +269,10 @@
             </div>
             <h2 class="text-lg font-bold text-slate-900">جميع المدرسين</h2>
           </div>
-          <div class="text-sm font-semibold text-slate-500">{{ allTeachersList.length }} مدرس</div>
+          <div class="flex items-center gap-3">
+            <TableSearch v-model="teacherSearch" />
+            <div class="text-sm font-semibold text-slate-500">{{ allTeachersList.length }} مدرس</div>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -284,7 +287,7 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr
-                v-for="teacher in allTeachersList"
+                v-for="teacher in filteredTeachers"
                 :key="teacher.id"
                 class="hover:bg-primary-50/50 transition-colors duration-150"
               >
@@ -362,6 +365,7 @@
             <h2 class="text-lg font-bold text-slate-900">عقود الباصات</h2>
           </div>
           <div class="flex items-center gap-3">
+            <TableSearch v-model="contractSearch" />
             <Link href="/bus-contracts/create" class="btn-primary text-sm px-4 py-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -388,7 +392,7 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr
-                v-for="(contract, index) in busContracts"
+                v-for="(contract, index) in filteredContracts"
                 :key="contract.id"
                 class="hover:bg-primary-50/50 transition-colors duration-150"
               >
@@ -410,7 +414,7 @@
             </tbody>
           </table>
         </div>
-        <div v-if="busContracts.length === 0" class="p-10 text-center">
+        <div v-if="filteredContracts.length === 0" class="p-10 text-center">
           <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -429,6 +433,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
+import TableSearch from '@/Components/TableSearch.vue'
 
 const props = defineProps({
   stats: Object,
@@ -445,6 +450,26 @@ const allTeachersNextPage = ref(props.allTeachersNextPage)
 const allTeachersLoading = ref(false)
 const allTeachersSentinel = ref(null)
 let allTeachersObserver = null
+const teacherSearch = ref('')
+const contractSearch = ref('')
+
+const matchesSearch = (item, term) => {
+  if (!term) return true
+  const t = term.toLowerCase()
+  return Object.values(item).some(val => {
+    if (val == null) return false
+    if (typeof val === 'string') return val.toLowerCase().includes(t)
+    if (typeof val === 'number') return String(val).includes(t)
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.some(v => typeof v === 'object' ? matchesSearch(v, term) : String(v).toLowerCase().includes(t))
+      return matchesSearch(val, term)
+    }
+    return false
+  })
+}
+
+const filteredTeachers = computed(() => allTeachersList.value.filter(item => matchesSearch(item, teacherSearch.value)))
+const filteredContracts = computed(() => props.busContracts.filter(item => matchesSearch(item, contractSearch.value)))
 
 const loadMoreTeachers = async () => {
   if (allTeachersLoading.value || !allTeachersNextPage.value) return

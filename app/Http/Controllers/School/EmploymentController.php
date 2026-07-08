@@ -7,7 +7,6 @@ use App\Models\Employment;
 use App\Models\Subject;
 use App\Models\TeacherProfile;
 use App\Notifications\EmploymentEnded;
-use App\Notifications\InvitationAccepted;
 use App\Notifications\TeacherHired;
 use App\Notifications\TeacherInvited;
 use Illuminate\Http\Request;
@@ -18,15 +17,6 @@ class EmploymentController extends Controller
 {
     public function teachers()
     {
-        $school = Auth::user()->load('schoolProfile');
-
-        $schoolProfile = $school->schoolProfile;
-        $isApproved = $schoolProfile && $schoolProfile->status === 'approved';
-
-        if (request()->wantsJson() && !$isApproved) {
-            return response()->json(['data' => [], 'current_page' => 1, 'last_page' => 1]);
-        }
-
         $teachers = TeacherProfile::with(['user', 'subject', 'grades'])
             ->where('status', 'approved')
             ->where('employment_status', 'available')
@@ -38,21 +28,15 @@ class EmploymentController extends Controller
         }
 
         return Inertia::render('School/TeachersIndex', [
-            'teachers' => $isApproved ? $teachers->items() : [],
-            'nextPage' => $isApproved && $teachers->currentPage() < $teachers->lastPage() ? $teachers->currentPage() + 1 : null,
-            'subjects' => $isApproved ? Subject::orderBy('name')->get() : [],
-            'isApproved' => $isApproved,
+            'teachers' => $teachers->items(),
+            'nextPage' => $teachers->currentPage() < $teachers->lastPage() ? $teachers->currentPage() + 1 : null,
+            'subjects' => Subject::orderBy('name')->get(),
+            'isApproved' => true,
         ]);
     }
 
     public function invite(Request $request)
     {
-        $schoolProfile = Auth::user()->schoolProfile;
-
-        if (!$schoolProfile || $schoolProfile->status !== 'approved') {
-            return back()->withErrors(['school' => 'يجب أن تكون بيانات المدرسة معتمدة أولاً']);
-        }
-
         $data = $request->validate([
             'teacher_id' => ['required', 'exists:teacher_profiles,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
@@ -78,15 +62,15 @@ class EmploymentController extends Controller
             return back()->withErrors(['teacher' => 'لديك دعوة سابقة لهذا المدرس']);
         }
 
-        $school = Auth::user()->schoolProfile;
+        $user = Auth::user();
 
         $employment = Employment::create([
             'school_id' => Auth::id(),
             'teacher_id' => $data['teacher_id'],
             'subject_id' => $data['subject_id'],
             'message' => $data['message'],
-            'contact_phone' => $school->phone,
-            'contact_email' => Auth::user()->email,
+            'contact_phone' => null,
+            'contact_email' => $user->email,
             'status' => 'invited',
         ]);
 
@@ -97,7 +81,7 @@ class EmploymentController extends Controller
 
     public function invitations()
     {
-        $employments = Employment::with(['teacher.user', 'teacher.subject', 'subject'])
+        $employments = Employment::with(['teacher.user', 'teacher.subject', 'teacher.grades', 'subject', 'interview'])
             ->where('school_id', Auth::id())
             ->whereIn('status', ['invited', 'accepted', 'interviewed'])
             ->latest()
@@ -110,10 +94,6 @@ class EmploymentController extends Controller
 
     public function markInterviewed(Employment $employment)
     {
-        if ((int) $employment->school_id !== (int) Auth::id()) {
-            abort(403);
-        }
-
         if ($employment->status !== 'accepted') {
             return back()->withErrors(['employment' => 'يجب أن يقبل المدرس الدعوة أولاً']);
         }
@@ -125,16 +105,6 @@ class EmploymentController extends Controller
 
     public function hire(Employment $employment)
     {
-        if ((int) $employment->school_id !== (int) Auth::id()) {
-            abort(403);
-        }
-
-        $schoolProfile = Auth::user()->schoolProfile;
-
-        if (!$schoolProfile || $schoolProfile->status !== 'approved') {
-            return back()->withErrors(['school' => 'يجب أن تكون بيانات المدرسة معتمدة أولاً']);
-        }
-
         if (!in_array($employment->status, ['accepted', 'interviewed'])) {
             return back()->withErrors(['employment' => 'لا يمكن توظيف هذا المدرس حالياً']);
         }
@@ -153,10 +123,6 @@ class EmploymentController extends Controller
 
     public function reject(Employment $employment)
     {
-        if ((int) $employment->school_id !== (int) Auth::id()) {
-            abort(403);
-        }
-
         if ($employment->status === 'hired') {
             return back()->withErrors(['employment' => 'لا يمكن رفض مدرس تم توظيفه']);
         }
@@ -181,10 +147,6 @@ class EmploymentController extends Controller
 
     public function endEmployment(Employment $employment)
     {
-        if ((int) $employment->school_id !== (int) Auth::id()) {
-            abort(403);
-        }
-
         if ($employment->status !== 'hired') {
             return back()->withErrors(['employment' => 'لا يمكن إنهاء توظيف غير نشط']);
         }

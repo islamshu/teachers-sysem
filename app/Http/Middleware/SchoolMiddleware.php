@@ -13,7 +13,7 @@ class SchoolMiddleware
             abort(403);
         }
 
-        if (!auth()->user()->isSchool()) {
+        if (!auth()->user()->hasRole('school')) {
             abort(403);
         }
 

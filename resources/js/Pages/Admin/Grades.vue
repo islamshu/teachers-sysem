@@ -20,6 +20,9 @@
 
       <!-- Grades List -->
       <div class="card overflow-hidden animate-fade-in-up animate-delay-100">
+        <div class="p-6 border-b border-surface-200 flex items-center justify-between">
+          <TableSearch v-model="search" />
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
@@ -30,7 +33,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-surface-100">
-              <tr v-for="(grade, index) in grades" :key="grade.id" class="hover:bg-primary-50/50 transition-colors">
+              <tr v-for="(grade, index) in filteredList" :key="grade.id" class="hover:bg-primary-50/50 transition-colors">
                 <td class="px-6 py-4 text-slate-500 font-medium">{{ index + 1 }}</td>
                 <td class="px-6 py-4 font-medium text-slate-900">{{ grade.name }}</td>
                 <td class="px-6 py-4">
@@ -48,7 +51,7 @@
                   </div>
                 </td>
               </tr>
-              <tr v-if="grades.length === 0">
+              <tr v-if="filteredList.length === 0">
                 <td colspan="3" class="px-6 py-12 text-center text-slate-500">لا توجد صفوف مضافة بعد</td>
               </tr>
             </tbody>
@@ -97,10 +100,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
+import TableSearch from '@/Components/TableSearch.vue'
 
 const props = defineProps({
   grades: Array,
@@ -108,6 +112,25 @@ const props = defineProps({
 
 const page = usePage()
 const flash = page.props.flash || {}
+
+const search = ref('')
+
+const matchesSearch = (item, term) => {
+  if (!term) return true
+  const t = term.toLowerCase()
+  return Object.values(item).some(val => {
+    if (val == null) return false
+    if (typeof val === 'string') return val.toLowerCase().includes(t)
+    if (typeof val === 'number') return String(val).includes(t)
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.some(v => typeof v === 'object' ? matchesSearch(v, term) : String(v).toLowerCase().includes(t))
+      return matchesSearch(val, term)
+    }
+    return false
+  })
+}
+
+const filteredList = computed(() => props.grades.filter(item => matchesSearch(item, search.value)))
 
 const showModal = ref(false)
 const editingGrade = ref(null)

@@ -27,6 +27,7 @@
           <div class="flex items-center gap-2">
             <span class="text-sm font-semibold text-slate-500">{{ contracts.length }} عقد</span>
           </div>
+          <TableSearch v-model="search" />
   
         </div>
         <div class="overflow-x-auto">
@@ -44,7 +45,7 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr
-                v-for="(contract, index) in contracts"
+                v-for="(contract, index) in filteredList"
                 :key="contract.id"
                 class="hover:bg-primary-50/50 transition-colors duration-150"
               >
@@ -77,7 +78,7 @@
             </tbody>
           </table>
         </div>
-        <div v-if="contracts.length === 0" class="p-10 text-center">
+        <div v-if="filteredList.length === 0" class="p-10 text-center">
           <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -95,13 +96,34 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
+import TableSearch from '@/Components/TableSearch.vue'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
   contracts: Array,
 })
+
+const search = ref('')
+
+const matchesSearch = (item, term) => {
+  if (!term) return true
+  const t = term.toLowerCase()
+  return Object.values(item).some(val => {
+    if (val == null) return false
+    if (typeof val === 'string') return val.toLowerCase().includes(t)
+    if (typeof val === 'number') return String(val).includes(t)
+    if (typeof val === 'object') {
+      if (Array.isArray(val)) return val.some(v => typeof v === 'object' ? matchesSearch(v, term) : String(v).toLowerCase().includes(t))
+      return matchesSearch(val, term)
+    }
+    return false
+  })
+}
+
+const filteredList = computed(() => props.contracts.filter(item => matchesSearch(item, search.value)))
 
 function deleteContract(contract) {
   Swal.fire({

@@ -13,7 +13,7 @@ class AdminMiddleware
             abort(403);
         }
 
-        if (!auth()->user()->is_admin) {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403);
         }
 

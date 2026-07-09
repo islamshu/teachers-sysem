@@ -1,8 +1,8 @@
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { apiFetch } from '@/utils/api'
 
 const unreadCount = ref(0)
-let interval = null
+let echo = null
 
 export function useNotifications() {
   const fetchUnread = async () => {
@@ -10,21 +10,29 @@ export function useNotifications() {
       const data = await apiFetch('/notifications/unread-count')
       unreadCount.value = data.count
     } catch {
-      // ignore
+      //
     }
   }
 
-  const startPolling = () => {
+  const startListening = () => {
     fetchUnread()
-    interval = setInterval(fetchUnread, 15000)
-  }
-
-  const stopPolling = () => {
-    if (interval) {
-      clearInterval(interval)
-      interval = null
+    if (window.Echo) {
+      const userId = window.__userId
+      if (userId) {
+        echo = window.Echo.private(`App.Models.User.${userId}`)
+          .notification((notification) => {
+            unreadCount.value++
+          })
+      }
     }
   }
 
-  return { unreadCount, fetchUnread, startPolling, stopPolling }
+  const stopListening = () => {
+    if (echo) {
+      echo.stopListening('.notification')
+      echo = null
+    }
+  }
+
+  return { unreadCount, fetchUnread, startListening, stopListening }
 }

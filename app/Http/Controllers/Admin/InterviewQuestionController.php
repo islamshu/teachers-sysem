@@ -50,4 +50,19 @@ class InterviewQuestionController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف السؤال بنجاح');
     }
+
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'items' => ['required', 'array'],
+            'items.*.id' => ['required', 'exists:interview_questions,id'],
+            'items.*.sort_order' => ['required', 'integer', 'min:0'],
+        ]);
+
+        foreach ($request->items as $item) {
+            InterviewQuestion::where('id', $item['id'])->update(['sort_order' => $item['sort_order']]);
+        }
+
+        return redirect()->back()->with('success', 'تم إعادة ترتيب الأسئلة بنجاح');
+    }
 }

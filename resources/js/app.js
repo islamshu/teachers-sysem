@@ -3,8 +3,24 @@ import { createApp, h } from 'vue'
 import { createInertiaApp, router } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { createI18n } from 'vue-i18n'
+import Echo from 'laravel-echo'
+import Pusher from 'pusher-js'
 import en from './i18n/en.json'
 import ar from './i18n/ar.json'
+
+window.Pusher = Pusher
+
+if (import.meta.env.VITE_REVERB_APP_KEY) {
+  window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
+    wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
+    wssPort: import.meta.env.VITE_REVERB_PORT || 8080,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME || 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+  })
+}
 
 // Initialize i18n
 const i18n = createI18n({
@@ -53,6 +69,11 @@ createInertiaApp({
 
     app.use(plugin)
     app.use(i18n)
+
+    // Expose user ID for Echo channel auth
+    if (props.initialPage.props.auth?.user) {
+      window.__userId = props.initialPage.props.auth.user.id
+    }
 
     // Set locale and direction on app mount
     const locale = i18n.global.locale.value

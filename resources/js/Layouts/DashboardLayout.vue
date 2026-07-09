@@ -854,20 +854,20 @@ import { useNotifications } from '@/composables/useNotifications'
 import { useFlashAlert } from '@/composables/useFlashAlert'
 import { applyPrimaryColor } from '@/utils/colors'
 
-const { unreadCount, startPolling, stopPolling } = useNotifications()
+const { unreadCount, startListening, stopListening } = useNotifications()
 
 const page = usePage()
 
 useFlashAlert()
 
 onMounted(() => {
-  startPolling()
+  startListening()
   const color = page.props.settings?.primary_color
   if (color) {
     applyPrimaryColor(color)
   }
 })
-onUnmounted(() => stopPolling())
+onUnmounted(() => stopListening())
 
 const showMenu = ref(false)
 const sidebarOpen = ref(false)

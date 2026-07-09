@@ -22,6 +22,9 @@
     "dependencies": {
         "@inertiajs/progress": "^0.2.7",
         "@inertiajs/vue3": "^3.3.0",
+        "laravel-echo": "^2.3.7",
+        "pusher-js": "^8.5.0",
+        "sortablejs": "^1.15.7",
         "sweetalert2": "^11.26.25",
         "vue": "^3.5.35",
         "vue-i18n": "^11.4.2"

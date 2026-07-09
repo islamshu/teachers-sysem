@@ -279,14 +279,14 @@ import NotificationBell from '@/Components/NotificationBell.vue'
 import { useNotifications } from '@/composables/useNotifications'
 import { useFlashAlert } from '@/composables/useFlashAlert'
 
-const { unreadCount, startPolling, stopPolling } = useNotifications()
+const { unreadCount, startListening, stopListening } = useNotifications()
 
 useFlashAlert()
 
 onMounted(() => {
-  if (page.props.auth.user) startPolling()
+  if (page.props.auth.user) startListening()
 })
-onUnmounted(() => stopPolling())
+onUnmounted(() => stopListening())
 
 const { locale } = useI18n()
 const currentLocale = ref(locale.value)

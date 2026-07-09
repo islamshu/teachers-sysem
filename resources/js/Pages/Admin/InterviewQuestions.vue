@@ -31,9 +31,12 @@
                 <th class="px-6 py-4 text-center text-sm font-bold text-slate-700">الإجراءات</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-surface-100">
-              <tr v-for="(q, index) in filteredList" :key="q.id" class="hover:bg-primary-50/50 transition-colors">
-                <td class="px-6 py-4 text-slate-500 font-medium">{{ index + 1 }}</td>
+            <tbody ref="tbodyRef" class="divide-y divide-surface-100">
+              <tr v-for="(q, index) in filteredList" :key="q.id" :data-id="q.id" class="hover:bg-primary-50/50 transition-colors">
+                <td class="px-6 py-4">
+                  <span class="drag-handle cursor-grab active:cursor-grabbing ml-2 text-slate-400 hover:text-slate-600 select-none text-lg" title="اسحب لإعادة الترتيب">⠿</span>
+                  <span class="text-slate-500 font-medium">{{ index + 1 }}</span>
+                </td>
                 <td class="px-6 py-4 font-medium text-slate-900">{{ q.question }}</td>
                 <td class="px-6 py-4 text-slate-600">{{ q.category || '-' }}</td>
                 <td class="px-6 py-4 text-center text-slate-600">{{ q.sort_order }}</td>
@@ -94,16 +97,6 @@
                     placeholder="مثال: مهارات تدريسية, شخصية, ..."
                   />
                 </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">الترتيب</label>
-                  <input
-                    v-model="form.sort_order"
-                    type="number"
-                    class="input-base"
-                    placeholder="0"
-                  />
-                </div>
               </div>
 
               <div class="flex gap-3 mt-8">
@@ -121,8 +114,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useForm, usePage } from '@inertiajs/vue3'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useForm, usePage, router } from '@inertiajs/vue3'
+import Sortable from 'sortablejs'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
 import TableSearch from '@/Components/TableSearch.vue'
@@ -135,6 +129,38 @@ const page = usePage()
 const flash = page.props.flash || {}
 
 const search = ref('')
+const tbodyRef = ref(null)
+let sortableInstance = null
+
+onMounted(() => {
+  nextTick(() => {
+    if (tbodyRef.value) {
+      sortableInstance = new Sortable(tbodyRef.value, {
+        handle: '.drag-handle',
+        animation: 150,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        ghostClass: 'bg-primary-100',
+        dragClass: 'opacity-80',
+        onEnd() {
+          const items = [...tbodyRef.value.querySelectorAll('tr[data-id]')].map((tr, i) => ({
+            id: parseInt(tr.dataset.id),
+            sort_order: i + 1,
+          }))
+          router.put('/admin/interview-questions/reorder', { items }, {
+            preserveScroll: true,
+          })
+        },
+      })
+    }
+  })
+})
+
+onUnmounted(() => {
+  if (sortableInstance) {
+    sortableInstance.destroy()
+    sortableInstance = null
+  }
+})
 
 const matchesSearch = (item, term) => {
   if (!term) return true
@@ -164,9 +190,10 @@ const form = useForm({
 
 const openAddModal = () => {
   editingQuestion.value = null
-  form.question = ''
-  form.category = ''
-  form.sort_order = 0
+  form.reset()
+  form.sort_order = props.questions.length > 0
+    ? Math.max(...props.questions.map(q => q.sort_order)) + 1
+    : 1
   showModal.value = true
 }
 
@@ -197,9 +224,7 @@ const submitForm = () => {
 
 const confirmDelete = (q) => {
   if (confirm(`هل أنت متأكد من حذف "${q.question}"؟`)) {
-    useForm({}).delete(`/admin/interview-questions/${q.id}`, {
-      onSuccess: () => {},
-    })
+    useForm({}).delete(`/admin/interview-questions/${q.id}`)
   }
 }
 </script>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Employee;
 
+use App\Events\PurchaseUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
 use App\Notifications\PurchaseCompleted;
@@ -62,6 +63,8 @@ class PurchaseController extends Controller
         $purchase->update($data);
 
         $purchase->creator->notify(new PurchaseCompleted($purchase));
+
+        PurchaseUpdated::dispatch('completed', $purchase);
 
         return redirect()->back()->with('success', 'تم إكمال طلب الشراء بنجاح');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\TaskUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\DailyTaskLog;
 use App\Models\FixedTask;
@@ -102,6 +103,8 @@ class FixedTaskController extends Controller
 
         $task->roles()->attach($validated['role_ids']);
 
+        TaskUpdated::dispatch('fixed', 'created', ['task_id' => $task->id]);
+
         return redirect()->back()->with('success', 'تم إنشاء المهمة اليومية بنجاح');
     }
 
@@ -123,12 +126,16 @@ class FixedTaskController extends Controller
 
         $fixedTask->roles()->sync($validated['role_ids']);
 
+        TaskUpdated::dispatch('fixed', 'updated', ['task_id' => $fixedTask->id]);
+
         return redirect()->back()->with('success', 'تم تحديث المهمة اليومية بنجاح');
     }
 
     public function destroy(FixedTask $fixedTask)
     {
         $fixedTask->delete();
+
+        TaskUpdated::dispatch('fixed', 'deleted', ['task_id' => $fixedTask->id]);
 
         return redirect()->back()->with('success', 'تم حذف المهمة اليومية بنجاح');
     }

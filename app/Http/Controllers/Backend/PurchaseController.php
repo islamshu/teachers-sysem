@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
+use App\Events\PurchaseUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
 use App\Models\User;
@@ -56,6 +57,8 @@ class PurchaseController extends Controller
         foreach ($employees as $employee) {
             $employee->notify(new NewPurchaseAssignment($purchase));
         }
+
+        PurchaseUpdated::dispatch('created', $purchase);
 
         return redirect()->route('admin.purchases.index')
             ->with('success', 'تم إضافة طلب الشراء بنجاح');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\School;
 
+use App\Events\EmploymentUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Employment;
 use App\Models\Subject;
@@ -76,6 +77,8 @@ class EmploymentController extends Controller
 
         $teacher->user->notify(new TeacherInvited($employment));
 
+        EmploymentUpdated::dispatch('invited', $employment);
+
         return back()->with('success', 'تم إرسال الدعوة بنجاح');
     }
 
@@ -118,6 +121,8 @@ class EmploymentController extends Controller
 
         $employment->teacher->user->notify(new TeacherHired($employment));
 
+        EmploymentUpdated::dispatch('hired', $employment);
+
         return back()->with('success', 'تم توظيف المدرس بنجاح');
     }
 
@@ -128,6 +133,8 @@ class EmploymentController extends Controller
         }
 
         $employment->update(['status' => 'rejected']);
+
+        EmploymentUpdated::dispatch('rejected', $employment);
 
         return back()->with('success', 'تم رفض الدعوة');
     }
@@ -156,6 +163,8 @@ class EmploymentController extends Controller
         $employment->teacher->update(['employment_status' => 'available']);
 
         $employment->teacher->user->notify(new EmploymentEnded($employment));
+
+        EmploymentUpdated::dispatch('ended', $employment);
 
         return back()->with('success', 'تم إنهاء توظيف المدرس بنجاح');
     }

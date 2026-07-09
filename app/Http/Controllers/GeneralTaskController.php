@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TaskUpdated;
 use App\Models\GeneralTask;
 use App\Models\GeneralTaskLog;
 use Carbon\Carbon;
@@ -80,6 +81,8 @@ class GeneralTaskController extends Controller
             'completed_at' => now(),
         ]);
 
+        TaskUpdated::dispatch('general', 'completed', ['task_id' => $generalTask->id, 'user_id' => $user->id]);
+
         return redirect()->back()->with('success', 'تم إنجاز المهمة');
     }
 
@@ -90,6 +93,8 @@ class GeneralTaskController extends Controller
         GeneralTaskLog::where('general_task_id', $generalTask->id)
             ->where('user_id', $user->id)
             ->delete();
+
+        TaskUpdated::dispatch('general', 'undone', ['task_id' => $generalTask->id, 'user_id' => $user->id]);
 
         return redirect()->back()->with('success', 'تم التراجع عن إنجاز المهمة');
     }

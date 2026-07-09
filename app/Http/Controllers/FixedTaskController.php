@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TaskUpdated;
 use App\Models\DailyTaskLog;
 use App\Models\FixedTask;
 use Carbon\Carbon;
@@ -71,6 +72,8 @@ class FixedTaskController extends Controller
             'completed_at' => now(),
         ]);
 
+        TaskUpdated::dispatch('fixed', 'completed', ['task_id' => $fixedTask->id, 'user_id' => $user->id]);
+
         return redirect()->back()->with('success', 'تم إنجاز المهمة');
     }
 
@@ -83,6 +86,8 @@ class FixedTaskController extends Controller
             ->where('user_id', $user->id)
             ->whereDate('date', $today)
             ->delete();
+
+        TaskUpdated::dispatch('fixed', 'undone', ['task_id' => $fixedTask->id, 'user_id' => $user->id]);
 
         return redirect()->back()->with('success', 'تم التراجع عن إنجاز المهمة');
     }

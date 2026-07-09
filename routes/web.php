@@ -317,6 +317,8 @@ Route::middleware('auth')->group(function () {
             ->name('interview-questions.index');
         Route::post('/interview-questions', [InterviewQuestionController::class, 'store'])
             ->name('interview-questions.store');
+        Route::put('/interview-questions/reorder', [InterviewQuestionController::class, 'reorder'])
+            ->name('interview-questions.reorder');
         Route::put('/interview-questions/{interviewQuestion}', [InterviewQuestionController::class, 'update'])
             ->name('interview-questions.update');
         Route::delete('/interview-questions/{interviewQuestion}', [InterviewQuestionController::class, 'destroy'])

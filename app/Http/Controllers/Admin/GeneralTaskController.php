@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\TaskUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\GeneralTask;
 use App\Models\GeneralTaskLog;
@@ -136,6 +137,8 @@ class GeneralTaskController extends Controller
             $task->roles()->attach($validated['role_ids']);
         }
 
+        TaskUpdated::dispatch('general', 'created', ['task_id' => $task->id]);
+
         return redirect()->back()->with('success', 'تم إنشاء المهمة العامة بنجاح');
     }
 
@@ -168,12 +171,16 @@ class GeneralTaskController extends Controller
         $generalTask->assignedUsers()->sync($validated['user_ids'] ?? []);
         $generalTask->roles()->sync($validated['role_ids'] ?? []);
 
+        TaskUpdated::dispatch('general', 'updated', ['task_id' => $generalTask->id]);
+
         return redirect()->back()->with('success', 'تم تحديث المهمة العامة بنجاح');
     }
 
     public function destroy(GeneralTask $generalTask)
     {
         $generalTask->delete();
+
+        TaskUpdated::dispatch('general', 'deleted', ['task_id' => $generalTask->id]);
 
         return redirect()->back()->with('success', 'تم حذف المهمة العامة بنجاح');
     }

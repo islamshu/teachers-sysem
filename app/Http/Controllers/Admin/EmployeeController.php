@@ -18,7 +18,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = User::where('role', 'employee')
-            ->with('branches', 'roles', 'school')
+            ->with('branches', 'roles')
             ->latest()
             ->paginate(10);
 
@@ -31,7 +31,6 @@ class EmployeeController extends Controller
             'nextPage' => $employees->currentPage() < $employees->lastPage() ? $employees->currentPage() + 1 : null,
             'branches' => Branch::all(),
             'roles' => Role::all(),
-            'schools' => User::where('role', 'school')->with('schoolProfile')->orderBy('name')->get(),
         ]);
     }
 
@@ -79,7 +78,6 @@ class EmployeeController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'school_id' => ['required', 'exists:users,id'],
             'branch_ids' => ['required', 'array', 'min:1'],
             'branch_ids.*' => ['exists:branches,id'],
             'role_ids' => ['required', 'array', 'min:1'],
@@ -91,7 +89,6 @@ class EmployeeController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'employee',
-            'school_id' => $validated['school_id'],
         ]);
 
         $user->branches()->attach($validated['branch_ids']);
@@ -112,7 +109,6 @@ class EmployeeController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'string', 'min:8'],
-            'school_id' => ['required', 'exists:users,id'],
             'branch_ids' => ['required', 'array', 'min:1'],
             'branch_ids.*' => ['exists:branches,id'],
             'role_ids' => ['required', 'array', 'min:1'],
@@ -122,7 +118,6 @@ class EmployeeController extends Controller
         $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'school_id' => $validated['school_id'],
         ];
 
         if (!empty($validated['password'])) {

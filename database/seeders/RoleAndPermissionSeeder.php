@@ -35,6 +35,7 @@ class RoleAndPermissionSeeder extends Seeder
             'إجراء المقابلات',
             'إدارة أسئلة المقابلات',
             'إدارة المشتريات',
+            'إدارة الحسابات المالية',
         ];
 
         foreach ($permissions as $permission) {

@@ -27,6 +27,11 @@ class SettingsController extends Controller
             'contact_phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
             'about' => 'nullable|string|max:2000',
+            'hero_title' => 'nullable|string|max:255',
+            'hero_subtitle' => 'nullable|string|max:500',
+            'hero_bg_from' => 'nullable|string|max:50',
+            'hero_bg_to' => 'nullable|string|max:50',
+            'show_stats' => 'nullable|boolean',
         ]);
 
         if ($request->hasFile('site_logo')) {

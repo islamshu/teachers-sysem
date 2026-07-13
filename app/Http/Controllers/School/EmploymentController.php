@@ -54,7 +54,7 @@ class EmploymentController extends Controller
             return back()->withErrors(['teacher' => 'هذا المدرس غير معتمد']);
         }
 
-        $existing = Employment::where('school_id', Auth::id())
+        $existing = Employment::where('school_id', Auth::user()->effectiveSchoolId())
             ->where('teacher_id', $data['teacher_id'])
             ->whereIn('status', ['invited', 'accepted'])
             ->first();
@@ -66,7 +66,7 @@ class EmploymentController extends Controller
         $user = Auth::user();
 
         $employment = Employment::create([
-            'school_id' => Auth::id(),
+            'school_id' => Auth::user()->effectiveSchoolId(),
             'teacher_id' => $data['teacher_id'],
             'subject_id' => $data['subject_id'],
             'message' => $data['message'],
@@ -85,7 +85,7 @@ class EmploymentController extends Controller
     public function invitations()
     {
         $employments = Employment::with(['teacher.user', 'teacher.subject', 'teacher.grades', 'subject', 'interview'])
-            ->where('school_id', Auth::id())
+            ->where('school_id', Auth::user()->effectiveSchoolId())
             ->whereIn('status', ['invited', 'accepted', 'interviewed'])
             ->latest()
             ->get();
@@ -142,7 +142,7 @@ class EmploymentController extends Controller
     public function employees()
     {
         $employments = Employment::with(['teacher.user', 'teacher.subject', 'subject'])
-            ->where('school_id', Auth::id())
+            ->where('school_id', Auth::user()->effectiveSchoolId())
             ->where('status', 'hired')
             ->latest('hired_at')
             ->get();

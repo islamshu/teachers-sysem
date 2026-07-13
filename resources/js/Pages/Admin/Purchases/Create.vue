@@ -56,13 +56,18 @@
             </div>
 
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1.5">الموظفون المكلفون <span class="text-red-500">*</span></label>
-              <MultiSelect
-                v-model="form.employee_ids"
-                :options="employeeOptions"
-                :error="form.errors.employee_ids"
-                placeholder="اختر الموظفين..."
-              />
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">الموظف المكلف <span class="text-red-500">*</span></label>
+              <select
+                v-model="form.employee_id"
+                class="input-base"
+              >
+                <option value="" disabled>اختر موظف...</option>
+                <option v-for="emp in employees" :key="emp.id" :value="emp.id">
+                  {{ emp.name }}
+                </option>
+              </select>
+              <p v-if="form.errors.employee_id" class="mt-1 text-xs text-red-500 font-semibold">{{ form.errors.employee_id }}</p>
+              <p v-if="employees.length === 0" class="mt-1 text-xs text-amber-600 font-semibold">لا يوجد موظفين لديهم حسابات مالية</p>
             </div>
 
             <div>
@@ -107,23 +112,17 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { Link, router, useForm } from '@inertiajs/vue3'
+import { Link, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
-import MultiSelect from '@/Components/MultiSelect.vue'
 
 const props = defineProps({
   employees: Array,
 })
 
-const employeeOptions = computed(() =>
-  props.employees.map((e) => ({ id: e.id, label: e.name }))
-)
-
 const form = useForm({
   item_name: '',
   amount: '',
-  employee_ids: [],
+  employee_id: '',
   notes: '',
   requires_invoice: false,
 })

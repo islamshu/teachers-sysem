@@ -13,10 +13,16 @@ class AdminMiddleware
             abort(403);
         }
 
-        if (!auth()->user()->hasRole('admin')) {
-            abort(403);
+        $user = auth()->user();
+
+        if ($user->hasRole('admin')) {
+            return $next($request);
         }
 
-        return $next($request);
+        if ($user->getAllPermissions()->count() > 0) {
+            return $next($request);
+        }
+
+        abort(403);
     }
 }

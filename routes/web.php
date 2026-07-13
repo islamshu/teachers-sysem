@@ -14,11 +14,17 @@ use App\Http\Controllers\Backend\DashboardController as AdminDashboardController
 use App\Http\Controllers\Backend\LookupController;
 use App\Http\Controllers\Backend\SchoolController;
 use App\Http\Controllers\Backend\SettingsController;
+use App\Http\Controllers\Backend\FrontendSettingController;
+use App\Http\Controllers\Backend\SlideController;
+use App\Http\Controllers\Backend\TestimonialController;
+use App\Http\Controllers\Backend\StepController;
 use App\Http\Controllers\Backend\TeacherController;
 use App\Http\Controllers\Backend\UserController;
 use App\Http\Controllers\Frontend\BusContractController;
 use App\Http\Controllers\Frontend\TeacherController as FrontendTeacherController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Backend\BalanceController;
 use App\Http\Controllers\Backend\PurchaseController as AdminPurchaseController;
 use App\Http\Controllers\Employee\PurchaseController as EmployeePurchaseController;
 use App\Http\Controllers\School\EmploymentController as SchoolEmploymentController;
@@ -47,6 +53,10 @@ Route::get('/bus-contracts/create', [BusContractController::class, 'create'])
     ->name('bus-contracts.create');
 Route::post('/bus-contracts', [BusContractController::class, 'store'])
     ->name('bus-contracts.store');
+
+// Contact form
+Route::post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store');
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
@@ -126,14 +136,18 @@ Route::middleware('auth')->group(function () {
         });
 
     // Teacher Employment
-    Route::middleware('teacher')->prefix('teacher')->name('teacher.')->group(function () {
+    Route::prefix('teacher')->name('teacher.')->group(function () {
         Route::get('/invitations', [TeacherEmploymentController::class, 'invitations'])
+            ->middleware('permission:الرد على الدعوات')
             ->name('invitations');
         Route::patch('/employments/{employment}/accept', [TeacherEmploymentController::class, 'accept'])
+            ->middleware('teacher')
             ->name('employments.accept');
         Route::patch('/employments/{employment}/decline', [TeacherEmploymentController::class, 'decline'])
+            ->middleware('teacher')
             ->name('employments.decline');
         Route::get('/my-school', [TeacherEmploymentController::class, 'mySchool'])
+            ->middleware('teacher')
             ->name('my-school');
     });
 
@@ -156,175 +170,292 @@ Route::middleware('auth')->group(function () {
 
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-        // Teachers management
-        Route::get('/teachers/create', [TeacherController::class, 'create'])
-            ->name('teachers.create');
-        Route::post('/teachers', [TeacherController::class, 'store'])
-            ->name('teachers.store');
-        Route::get('/teachers', [TeacherController::class, 'index'])
-            ->name('teachers.index');
-        Route::patch('/teachers/batch/approve', [TeacherController::class, 'batchApprove'])
-            ->name('teachers.batch.approve');
-        Route::patch('/teachers/batch/reject', [TeacherController::class, 'batchReject'])
-            ->name('teachers.batch.reject');
-        Route::patch('/teachers/{teacher}/approve', [TeacherController::class, 'approve'])
-            ->name('teachers.approve');
-        Route::patch('/teachers/{teacher}/reject', [TeacherController::class, 'reject'])
-            ->name('teachers.reject');
-        Route::get('/teachers/{teacher}', [TeacherController::class, 'show'])
-            ->name('teachers.show');
-        Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy'])
-            ->name('teachers.destroy');
+        // محتوى إضافي - لا يوجد صلاحية محددة (دور admin فقط)
+        Route::middleware('role:admin')->group(function () {
+            // Contacts
+            Route::get('/contacts', [ContactController::class, 'index'])
+                ->name('contacts.index');
+            Route::patch('/contacts/{contact}/read', [ContactController::class, 'markAsRead'])
+                ->name('contacts.read');
 
-        // Users management
-        Route::get('/users', [UserController::class, 'index'])
-            ->name('users.index');
-        Route::delete('/users/{user}', [UserController::class, 'destroy'])
-            ->name('users.destroy');
+            // Frontend Settings (consolidated page)
+            Route::get('/frontend', [FrontendSettingController::class, 'index'])
+                ->name('frontend.index');
+            Route::post('/frontend/settings', [FrontendSettingController::class, 'updateSettings'])
+                ->name('frontend.settings.update');
+            Route::post('/frontend/slides', [FrontendSettingController::class, 'storeSlide'])
+                ->name('frontend.slides.store');
+            Route::post('/frontend/slides/reorder', [FrontendSettingController::class, 'reorderSlides'])
+                ->name('frontend.slides.reorder');
+            Route::post('/frontend/slides/{slide}', [FrontendSettingController::class, 'updateSlide'])
+                ->name('frontend.slides.update');
+            Route::delete('/frontend/slides/{slide}', [FrontendSettingController::class, 'destroySlide'])
+                ->name('frontend.slides.destroy');
+            Route::post('/frontend/testimonials', [FrontendSettingController::class, 'storeTestimonial'])
+                ->name('frontend.testimonials.store');
+            Route::post('/frontend/testimonials/{testimonial}', [FrontendSettingController::class, 'updateTestimonial'])
+                ->name('frontend.testimonials.update');
+            Route::delete('/frontend/testimonials/{testimonial}', [FrontendSettingController::class, 'destroyTestimonial'])
+                ->name('frontend.testimonials.destroy');
+            Route::post('/frontend/steps', [FrontendSettingController::class, 'storeStep'])
+                ->name('frontend.steps.store');
+            Route::post('/frontend/features', [FrontendSettingController::class, 'storeFeature'])
+                ->name('frontend.features.store');
+            Route::post('/frontend/features/{feature}', [FrontendSettingController::class, 'updateFeature'])
+                ->name('frontend.features.update');
+            Route::delete('/frontend/features/{feature}', [FrontendSettingController::class, 'destroyFeature'])
+                ->name('frontend.features.destroy');
+            Route::post('/frontend/steps/{step}', [FrontendSettingController::class, 'updateStep'])
+                ->name('frontend.steps.update');
+            Route::delete('/frontend/steps/{step}', [FrontendSettingController::class, 'destroyStep'])
+                ->name('frontend.steps.destroy');
 
-        // Settings
-        Route::get('/settings', [SettingsController::class, 'edit'])
-            ->name('settings.edit');
-        Route::post('/settings', [SettingsController::class, 'update'])
-            ->name('settings.update');
+            // Slides
+            Route::get('/slides', [SlideController::class, 'index'])
+                ->name('slides.index');
+            Route::post('/slides', [SlideController::class, 'store'])
+                ->name('slides.store');
+            Route::post('/slides/reorder', [SlideController::class, 'reorder'])
+                ->name('slides.reorder');
+            Route::post('/slides/{slide}', [SlideController::class, 'update'])
+                ->name('slides.update');
+            Route::delete('/slides/{slide}', [SlideController::class, 'destroy'])
+                ->name('slides.destroy');
 
-        // Bus contracts
-        Route::get('/bus-contracts', [AdminBusContractController::class, 'index'])
-            ->name('bus-contracts.index');
-        Route::get('/bus-contracts/{contract}', [AdminBusContractController::class, 'show'])
-            ->name('bus-contracts.show');
-        Route::delete('/bus-contracts/{contract}', [AdminBusContractController::class, 'destroy'])
-            ->name('bus-contracts.destroy');
+            // Testimonials
+            Route::get('/testimonials', [TestimonialController::class, 'index'])
+                ->name('testimonials.index');
+            Route::post('/testimonials', [TestimonialController::class, 'store'])
+                ->name('testimonials.store');
+            Route::post('/testimonials/{testimonial}', [TestimonialController::class, 'update'])
+                ->name('testimonials.update');
+            Route::delete('/testimonials/{testimonial}', [TestimonialController::class, 'destroy'])
+                ->name('testimonials.destroy');
 
-        // Subjects management
-        Route::get('/subjects', [LookupController::class, 'subjects'])
-            ->name('subjects.index');
-        Route::post('/subjects', [LookupController::class, 'storeSubject'])
-            ->name('subjects.store');
-        Route::put('/subjects/{subject}', [LookupController::class, 'updateSubject'])
-            ->name('subjects.update');
-        Route::delete('/subjects/{subject}', [LookupController::class, 'destroySubject'])
-            ->name('subjects.destroy');
+            // Steps
+            Route::get('/steps', [StepController::class, 'index'])
+                ->name('steps.index');
+            Route::post('/steps', [StepController::class, 'store'])
+                ->name('steps.store');
+            Route::post('/steps/{step}', [StepController::class, 'update'])
+                ->name('steps.update');
+            Route::delete('/steps/{step}', [StepController::class, 'destroy'])
+                ->name('steps.destroy');
+        });
 
-        // Grades management
-        Route::get('/grades', [LookupController::class, 'grades'])
-            ->name('grades.index');
-        Route::post('/grades', [LookupController::class, 'storeGrade'])
-            ->name('grades.store');
-        Route::put('/grades/{grade}', [LookupController::class, 'updateGrade'])
-            ->name('grades.update');
-        Route::delete('/grades/{grade}', [LookupController::class, 'destroyGrade'])
-            ->name('grades.destroy');
+        // Teachers management (requires permission)
+        Route::middleware('permission:إدارة المدرسين')->group(function () {
+            Route::get('/teachers/create', [TeacherController::class, 'create'])
+                ->name('teachers.create');
+            Route::post('/teachers', [TeacherController::class, 'store'])
+                ->name('teachers.store');
+            Route::get('/teachers', [TeacherController::class, 'index'])
+                ->name('teachers.index');
+            Route::patch('/teachers/batch/approve', [TeacherController::class, 'batchApprove'])
+                ->name('teachers.batch.approve');
+            Route::patch('/teachers/batch/reject', [TeacherController::class, 'batchReject'])
+                ->name('teachers.batch.reject');
+            Route::patch('/teachers/{teacher}/approve', [TeacherController::class, 'approve'])
+                ->name('teachers.approve');
+            Route::patch('/teachers/{teacher}/reject', [TeacherController::class, 'reject'])
+                ->name('teachers.reject');
+            Route::get('/teachers/{teacher}', [TeacherController::class, 'show'])
+                ->name('teachers.show');
+            Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy'])
+                ->name('teachers.destroy');
+        });
 
-        // Contract attachments
-        Route::get('/contract-attachments', [ContractAttachmentController::class, 'index'])
-            ->name('contract-attachments.index');
-        Route::post('/contract-attachments', [ContractAttachmentController::class, 'store'])
-            ->name('contract-attachments.store');
-        Route::put('/contract-attachments/{contractAttachment}', [ContractAttachmentController::class, 'update'])
-            ->name('contract-attachments.update');
-        Route::post('/contract-attachments/{contractAttachment}/toggle', [ContractAttachmentController::class, 'toggle'])
-            ->name('contract-attachments.toggle');
-        Route::delete('/contract-attachments/{contractAttachment}', [ContractAttachmentController::class, 'destroy'])
-            ->name('contract-attachments.destroy');
+        // Users management (requires permission)
+        Route::middleware('permission:إدارة المستخدمين')->group(function () {
+            Route::get('/users', [UserController::class, 'index'])
+                ->name('users.index');
+            Route::delete('/users/{user}', [UserController::class, 'destroy'])
+                ->name('users.destroy');
+        });
 
-        // Schools management
-        Route::get('/schools/create', [SchoolController::class, 'create'])
-            ->name('schools.create');
-        Route::post('/schools', [SchoolController::class, 'store'])
-            ->name('schools.store');
-        Route::get('/schools', [SchoolController::class, 'index'])
-            ->name('schools.index');
-        Route::patch('/schools/batch/approve', [SchoolController::class, 'batchApprove'])
-            ->name('schools.batch.approve');
-        Route::patch('/schools/batch/reject', [SchoolController::class, 'batchReject'])
-            ->name('schools.batch.reject');
-        Route::patch('/schools/{school}/approve', [SchoolController::class, 'approve'])
-            ->name('schools.approve');
-        Route::patch('/schools/{school}/reject', [SchoolController::class, 'reject'])
-            ->name('schools.reject');
-        Route::delete('/schools/{school}', [SchoolController::class, 'destroy'])
-            ->name('schools.destroy');
+        // Settings (requires permission)
+        Route::middleware('permission:إدارة الإعدادات')->group(function () {
+            Route::get('/settings', [SettingsController::class, 'edit'])
+                ->name('settings.edit');
+            Route::post('/settings', [SettingsController::class, 'update'])
+                ->name('settings.update');
+        });
 
-        // Roles & Permissions management
-        Route::get('/roles', [RolePermissionController::class, 'roles'])
-            ->name('roles.index');
-        Route::post('/roles', [RolePermissionController::class, 'storeRole'])
-            ->name('roles.store');
-        Route::put('/roles/{role}', [RolePermissionController::class, 'updateRole'])
-            ->name('roles.update');
-        Route::delete('/roles/{role}', [RolePermissionController::class, 'destroyRole'])
-            ->name('roles.destroy');
-        Route::get('/permissions', [RolePermissionController::class, 'permissions'])
-            ->name('permissions.index');
-        Route::post('/permissions', [RolePermissionController::class, 'storePermission'])
-            ->name('permissions.store');
-        Route::delete('/permissions/{permission}', [RolePermissionController::class, 'destroyPermission'])
-            ->name('permissions.destroy');
-        Route::get('/users/{user}/roles', [RolePermissionController::class, 'editUserRoles'])
-            ->name('users.roles.edit');
-        Route::put('/users/{user}/roles', [RolePermissionController::class, 'updateUserRoles'])
-            ->name('users.roles.update');
+        // Bus contracts (requires permission)
+        Route::middleware('permission:إدارة عقود الباص')->group(function () {
+            Route::get('/bus-contracts', [AdminBusContractController::class, 'index'])
+                ->name('bus-contracts.index');
+            Route::get('/bus-contracts/{contract}', [AdminBusContractController::class, 'show'])
+                ->name('bus-contracts.show');
+            Route::delete('/bus-contracts/{contract}', [AdminBusContractController::class, 'destroy'])
+                ->name('bus-contracts.destroy');
+        });
 
-        // Branches management
-        Route::get('/branches', [BranchController::class, 'index'])
-            ->name('branches.index');
-        Route::post('/branches', [BranchController::class, 'store'])
-            ->name('branches.store');
-        Route::put('/branches/{branch}', [BranchController::class, 'update'])
-            ->name('branches.update');
-        Route::delete('/branches/{branch}', [BranchController::class, 'destroy'])
-            ->name('branches.destroy');
+        // Subjects management (requires permission)
+        Route::middleware('permission:إدارة المواد')->group(function () {
+            Route::get('/subjects', [LookupController::class, 'subjects'])
+                ->name('subjects.index');
+            Route::post('/subjects', [LookupController::class, 'storeSubject'])
+                ->name('subjects.store');
+            Route::put('/subjects/{subject}', [LookupController::class, 'updateSubject'])
+                ->name('subjects.update');
+            Route::delete('/subjects/{subject}', [LookupController::class, 'destroySubject'])
+                ->name('subjects.destroy');
+        });
 
-        // Employees management
-        Route::get('/employees', [EmployeeController::class, 'index'])
-            ->name('employees.index');
-        Route::post('/employees', [EmployeeController::class, 'store'])
-            ->name('employees.store');
-        Route::put('/employees/{user}', [EmployeeController::class, 'update'])
-            ->name('employees.update');
-        Route::delete('/employees/{user}', [EmployeeController::class, 'destroy'])
-            ->name('employees.destroy');
-        Route::get('/employees/{user}/tasks-report', [EmployeeController::class, 'tasksReport'])
-            ->name('employees.tasks-report');
+        // Grades management (requires permission)
+        Route::middleware('permission:إدارة الصفوف')->group(function () {
+            Route::get('/grades', [LookupController::class, 'grades'])
+                ->name('grades.index');
+            Route::post('/grades', [LookupController::class, 'storeGrade'])
+                ->name('grades.store');
+            Route::put('/grades/{grade}', [LookupController::class, 'updateGrade'])
+                ->name('grades.update');
+            Route::delete('/grades/{grade}', [LookupController::class, 'destroyGrade'])
+                ->name('grades.destroy');
+        });
 
-        // Fixed Tasks management
-        Route::get('/fixed-tasks', [AdminFixedTaskController::class, 'index'])
-            ->name('fixed-tasks.index');
-        Route::get('/fixed-tasks/progress', [AdminFixedTaskController::class, 'progress'])
-            ->name('fixed-tasks.progress');
-        Route::post('/fixed-tasks', [AdminFixedTaskController::class, 'store'])
-            ->name('fixed-tasks.store');
-        Route::put('/fixed-tasks/{fixedTask}', [AdminFixedTaskController::class, 'update'])
-            ->name('fixed-tasks.update');
-        Route::delete('/fixed-tasks/{fixedTask}', [AdminFixedTaskController::class, 'destroy'])
-            ->name('fixed-tasks.destroy');
+        // Contract attachments (requires permission)
+        Route::middleware('permission:إدارة مرفقات العقود')->group(function () {
+            Route::get('/contract-attachments', [ContractAttachmentController::class, 'index'])
+                ->name('contract-attachments.index');
+            Route::post('/contract-attachments', [ContractAttachmentController::class, 'store'])
+                ->name('contract-attachments.store');
+            Route::put('/contract-attachments/{contractAttachment}', [ContractAttachmentController::class, 'update'])
+                ->name('contract-attachments.update');
+            Route::post('/contract-attachments/{contractAttachment}/toggle', [ContractAttachmentController::class, 'toggle'])
+                ->name('contract-attachments.toggle');
+            Route::delete('/contract-attachments/{contractAttachment}', [ContractAttachmentController::class, 'destroy'])
+                ->name('contract-attachments.destroy');
+        });
 
-        // General Tasks management
-        Route::get('/general-tasks', [GeneralTaskController::class, 'index'])
-            ->name('general-tasks.index');
-        Route::get('/general-tasks/{generalTask}', [GeneralTaskController::class, 'show'])
-            ->name('general-tasks.show');
-        Route::post('/general-tasks', [GeneralTaskController::class, 'store'])
-            ->name('general-tasks.store');
-        Route::put('/general-tasks/{generalTask}', [GeneralTaskController::class, 'update'])
-            ->name('general-tasks.update');
-        Route::delete('/general-tasks/{generalTask}', [GeneralTaskController::class, 'destroy'])
-            ->name('general-tasks.destroy');
+        // Schools management (requires permission)
+        Route::middleware('permission:إدارة المدارس')->group(function () {
+            Route::get('/schools/create', [SchoolController::class, 'create'])
+                ->name('schools.create');
+            Route::post('/schools', [SchoolController::class, 'store'])
+                ->name('schools.store');
+            Route::get('/schools', [SchoolController::class, 'index'])
+                ->name('schools.index');
+            Route::patch('/schools/batch/approve', [SchoolController::class, 'batchApprove'])
+                ->name('schools.batch.approve');
+            Route::patch('/schools/batch/reject', [SchoolController::class, 'batchReject'])
+                ->name('schools.batch.reject');
+            Route::patch('/schools/{school}/approve', [SchoolController::class, 'approve'])
+                ->name('schools.approve');
+            Route::patch('/schools/{school}/reject', [SchoolController::class, 'reject'])
+                ->name('schools.reject');
+            Route::delete('/schools/{school}', [SchoolController::class, 'destroy'])
+                ->name('schools.destroy');
+        });
 
-        // Interview Questions management
-        Route::get('/interview-questions', [InterviewQuestionController::class, 'index'])
-            ->name('interview-questions.index');
-        Route::post('/interview-questions', [InterviewQuestionController::class, 'store'])
-            ->name('interview-questions.store');
-        Route::put('/interview-questions/reorder', [InterviewQuestionController::class, 'reorder'])
-            ->name('interview-questions.reorder');
-        Route::put('/interview-questions/{interviewQuestion}', [InterviewQuestionController::class, 'update'])
-            ->name('interview-questions.update');
-        Route::delete('/interview-questions/{interviewQuestion}', [InterviewQuestionController::class, 'destroy'])
-            ->name('interview-questions.destroy');
+        // Roles & Permissions management (requires permission)
+        Route::middleware('permission:إدارة الأدوار')->group(function () {
+            Route::get('/roles', [RolePermissionController::class, 'roles'])
+                ->name('roles.index');
+            Route::post('/roles', [RolePermissionController::class, 'storeRole'])
+                ->name('roles.store');
+            Route::put('/roles/{role}', [RolePermissionController::class, 'updateRole'])
+                ->name('roles.update');
+            Route::delete('/roles/{role}', [RolePermissionController::class, 'destroyRole'])
+                ->name('roles.destroy');
+            Route::get('/permissions', [RolePermissionController::class, 'permissions'])
+                ->name('permissions.index');
+            Route::post('/permissions', [RolePermissionController::class, 'storePermission'])
+                ->name('permissions.store');
+            Route::delete('/permissions/{permission}', [RolePermissionController::class, 'destroyPermission'])
+                ->name('permissions.destroy');
+            Route::get('/users/{user}/roles', [RolePermissionController::class, 'editUserRoles'])
+                ->name('users.roles.edit');
+            Route::put('/users/{user}/roles', [RolePermissionController::class, 'updateUserRoles'])
+                ->name('users.roles.update');
+        });
 
-        // Purchases management
+        // Branches management (requires permission)
+        Route::middleware('permission:إدارة الفروع')->group(function () {
+            Route::get('/branches', [BranchController::class, 'index'])
+                ->name('branches.index');
+            Route::post('/branches', [BranchController::class, 'store'])
+                ->name('branches.store');
+            Route::put('/branches/{branch}', [BranchController::class, 'update'])
+                ->name('branches.update');
+            Route::delete('/branches/{branch}', [BranchController::class, 'destroy'])
+                ->name('branches.destroy');
+        });
+
+        // Employees management (requires permission)
+        Route::middleware('permission:إدارة الموظفين')->group(function () {
+            Route::get('/employees', [EmployeeController::class, 'index'])
+                ->name('employees.index');
+            Route::post('/employees', [EmployeeController::class, 'store'])
+                ->name('employees.store');
+            Route::put('/employees/{user}', [EmployeeController::class, 'update'])
+                ->name('employees.update');
+            Route::delete('/employees/{user}', [EmployeeController::class, 'destroy'])
+                ->name('employees.destroy');
+            Route::get('/employees/{user}/tasks-report', [EmployeeController::class, 'tasksReport'])
+                ->name('employees.tasks-report');
+        });
+
+        // Fixed Tasks management (requires permission)
+        Route::middleware('permission:إدارة المهام اليومية')->group(function () {
+            Route::get('/fixed-tasks', [AdminFixedTaskController::class, 'index'])
+                ->name('fixed-tasks.index');
+            Route::post('/fixed-tasks', [AdminFixedTaskController::class, 'store'])
+                ->name('fixed-tasks.store');
+            Route::put('/fixed-tasks/{fixedTask}', [AdminFixedTaskController::class, 'update'])
+                ->name('fixed-tasks.update');
+            Route::delete('/fixed-tasks/{fixedTask}', [AdminFixedTaskController::class, 'destroy'])
+                ->name('fixed-tasks.destroy');
+        });
+
+        // Progress report (requires separate permission)
+        Route::middleware('permission:عرض تقارير المهام')->group(function () {
+            Route::get('/fixed-tasks/progress', [AdminFixedTaskController::class, 'progress'])
+                ->name('fixed-tasks.progress');
+        });
+
+        // General Tasks management (requires permission)
+        Route::middleware('permission:إدارة المهام العامة')->group(function () {
+            Route::get('/general-tasks', [GeneralTaskController::class, 'index'])
+                ->name('general-tasks.index');
+            Route::get('/general-tasks/{generalTask}', [GeneralTaskController::class, 'show'])
+                ->name('general-tasks.show');
+            Route::post('/general-tasks', [GeneralTaskController::class, 'store'])
+                ->name('general-tasks.store');
+            Route::put('/general-tasks/{generalTask}', [GeneralTaskController::class, 'update'])
+                ->name('general-tasks.update');
+            Route::delete('/general-tasks/{generalTask}', [GeneralTaskController::class, 'destroy'])
+                ->name('general-tasks.destroy');
+        });
+
+        // Interview Questions management (requires permission)
+        Route::middleware('permission:إدارة أسئلة المقابلات')->group(function () {
+            Route::get('/interview-questions', [InterviewQuestionController::class, 'index'])
+                ->name('interview-questions.index');
+            Route::post('/interview-questions', [InterviewQuestionController::class, 'store'])
+                ->name('interview-questions.store');
+            Route::put('/interview-questions/reorder', [InterviewQuestionController::class, 'reorder'])
+                ->name('interview-questions.reorder');
+            Route::put('/interview-questions/{interviewQuestion}', [InterviewQuestionController::class, 'update'])
+                ->name('interview-questions.update');
+            Route::delete('/interview-questions/{interviewQuestion}', [InterviewQuestionController::class, 'destroy'])
+                ->name('interview-questions.destroy');
+        });
+
+        // Balance management (requires permission)
+        Route::middleware('permission:إدارة الحسابات المالية')->prefix('balances')->name('balances.')->group(function () {
+            Route::get('/', [BalanceController::class, 'index'])
+                ->name('index');
+            Route::get('/create', [BalanceController::class, 'create'])
+                ->name('create');
+            Route::post('/', [BalanceController::class, 'store'])
+                ->name('store');
+            Route::get('/user/{user}', [BalanceController::class, 'getUserBalance'])
+                ->name('user-balance');
+        });
+
+        // Purchases management (requires permission)
         Route::middleware('permission:إدارة المشتريات')->group(function () {
             Route::get('/purchases', [AdminPurchaseController::class, 'index'])
                 ->name('purchases.index');
@@ -352,6 +483,10 @@ Route::middleware('auth')->group(function () {
         ->name('general-tasks.user.complete');
     Route::post('/general-tasks/{generalTask}/undo', [UserGeneralTaskController::class, 'undo'])
         ->name('general-tasks.user.undo');
+
+    // Universal purchases view (for all authenticated users)
+    Route::get('/purchases', [AdminPurchaseController::class, 'indexAll'])
+        ->name('purchases.all');
 
     // Employee purchases
     Route::prefix('employee')->name('employee.')->group(function () {

@@ -16,5 +16,10 @@ class SettingSeeder extends Seeder
         Setting::set('contact_phone', '');
         Setting::set('address', '');
         Setting::set('about', '');
+        Setting::set('hero_title', '');
+        Setting::set('hero_subtitle', '');
+        Setting::set('hero_bg_from', '#1e40af');
+        Setting::set('hero_bg_to', '#7c3aed');
+        Setting::set('show_stats', '1');
     }
 }

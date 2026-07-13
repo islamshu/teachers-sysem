@@ -231,6 +231,13 @@
                     </svg>
                     الصفوف
                   </Link>
+                  <Link href="/admin/contacts" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
+                    :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Contacts' }">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    رسائل التواصل
+                  </Link>
                   <Link href="/admin/settings" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
                     :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/Settings' }">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,6 +257,7 @@
     <!-- Page Content -->
     <main class="relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+        <ValidationErrors />
         <slot />
       </div>
     </main>
@@ -276,6 +284,7 @@ import { Link, useForm, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { applyPrimaryColor } from '@/utils/colors'
 import NotificationBell from '@/Components/NotificationBell.vue'
+import ValidationErrors from '@/Components/ValidationErrors.vue'
 import { useNotifications } from '@/composables/useNotifications'
 import { useFlashAlert } from '@/composables/useFlashAlert'
 

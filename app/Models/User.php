@@ -89,6 +89,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Purchase::class, 'purchase_user')->withTimestamps();
     }
 
+    public function userBalance()
+    {
+        return $this->hasOne(UserBalance::class);
+    }
+
+    public function balanceTransactions()
+    {
+        return $this->hasMany(BalanceTransaction::class);
+    }
+
     public function effectiveSchoolId(): int
     {
         return $this->school_id ?? $this->id;

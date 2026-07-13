@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use App\Models\BusContract;
+use App\Models\Contact;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -28,6 +29,8 @@ class DashboardController extends Controller
             'users_schools' => User::where('role', 'school')->count(),
             'users_admins' => User::where('role', 'admin')->count(),
             'bus_contracts' => BusContract::count(),
+            'contacts_total' => Contact::count(),
+            'contacts_unread' => Contact::where('is_read', false)->count(),
         ];
 
         $recentPending = TeacherProfile::with(['user', 'subject'])
@@ -37,6 +40,8 @@ class DashboardController extends Controller
             ->get();
 
         $busContracts = BusContract::latest()->get();
+
+        $recentContacts = Contact::latest()->take(5)->get();
 
         $allTeachersQuery = TeacherProfile::with(['user', 'subject', 'grades'])
             ->latest();
@@ -58,6 +63,7 @@ class DashboardController extends Controller
             'allTeachers' => $allTeachers->items(),
             'allTeachersNextPage' => $allTeachers->currentPage() < $allTeachers->lastPage() ? $allTeachers->currentPage() + 1 : null,
             'busContracts' => $busContracts,
+            'recentContacts' => $recentContacts,
         ]);
     }
 }

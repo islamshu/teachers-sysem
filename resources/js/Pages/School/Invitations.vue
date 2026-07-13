@@ -135,9 +135,23 @@
                   </button>
                 </template>
 
-                <template v-if="employment.status === 'interviewed'">
+                <template v-if="employment.status === 'interviewed' && employment.interview">
+                  <div class="w-full p-3 rounded-xl bg-blue-50 border border-blue-200 mb-2">
+                    <div class="flex items-center justify-between">
+                      <p class="text-sm font-semibold text-blue-800">📋 نتيجة المقابلة</p>
+                      <span class="text-lg font-extrabold" :class="employment.interview.total_score / employment.interview.max_score >= 0.7 ? 'text-emerald-600' : employment.interview.total_score / employment.interview.max_score >= 0.5 ? 'text-amber-600' : 'text-red-600'">
+                        {{ employment.interview.total_score }}/{{ employment.interview.max_score }}
+                      </span>
+                    </div>
+                    <div class="mt-2 w-full bg-blue-200 rounded-full h-2">
+                      <div
+                        class="h-2 rounded-full transition-all duration-500"
+                        :class="employment.interview.total_score / employment.interview.max_score >= 0.7 ? 'bg-emerald-500' : employment.interview.total_score / employment.interview.max_score >= 0.5 ? 'bg-amber-500' : 'bg-red-500'"
+                        :style="{ width: (employment.interview.max_score > 0 ? (employment.interview.total_score / employment.interview.max_score) * 100 : 0) + '%' }"
+                      ></div>
+                    </div>
+                  </div>
                   <Link
-                    v-if="employment.interview"
                     :href="`/school/interviews/${employment.interview.id}`"
                     class="px-4 py-2 rounded-xl bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition-all text-xs"
                   >
@@ -145,7 +159,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
-                    عرض المقابلة
+                    عرض التفاصيل
                   </Link>
                   <button @click="hireTeacher(employment.id)" class="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold hover:bg-emerald-200 transition-all text-xs">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

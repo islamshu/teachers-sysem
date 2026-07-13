@@ -352,6 +352,60 @@
         </div>
       </div>
 
+      <!-- Contacts Card -->
+      <div class="card mb-8 animate-fade-in-up animate-delay-200">
+        <div class="p-6 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-500">رسائل التواصل</p>
+              <div class="flex items-center gap-3 mt-1">
+                <span class="text-3xl font-extrabold text-slate-900">{{ stats.contacts_total }}</span>
+                <span v-if="stats.contacts_unread > 0" class="badge-warning text-xs">{{ stats.contacts_unread }} غير مقروءة</span>
+              </div>
+            </div>
+          </div>
+          <Link href="/admin/contacts" class="btn-ghost px-4 py-2 text-sm">
+            عرض الكل
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+        <div v-if="recentContacts.length > 0" class="divide-y divide-surface-100 border-t border-surface-200">
+          <div
+            v-for="contact in recentContacts"
+            :key="contact.id"
+            class="flex items-center gap-4 p-4 hover:bg-surface-50 transition-colors"
+          >
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-surface-100 flex items-center justify-center flex-shrink-0">
+              <span class="text-sm font-bold text-primary-600">{{ contact.name.charAt(0) }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="font-bold text-slate-900 truncate text-sm">{{ contact.name }}</p>
+                <span v-if="!contact.is_read" class="w-2 h-2 rounded-full bg-red-500"></span>
+              </div>
+              <p class="text-sm text-slate-500 truncate">{{ contact.email }} · {{ contact.message.substring(0, 60) }}{{ contact.message.length > 60 ? '...' : '' }}</p>
+            </div>
+            <span class="text-xs text-slate-400 whitespace-nowrap">{{ contact.created_at }}</span>
+          </div>
+        </div>
+        <div v-else class="p-10 text-center border-t border-surface-200">
+          <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-1">لا توجد رسائل</h3>
+          <p class="text-sm text-slate-500">لم يتم استقبال أي رسائل بعد</p>
+        </div>
+      </div>
+
       <!-- Bus Contracts -->
       <div class="card mb-8 animate-fade-in-up animate-delay-300">
         <div class="p-6 border-b border-surface-200 flex items-center justify-between">
@@ -443,6 +497,7 @@ const props = defineProps({
   allTeachers: Array,
   allTeachersNextPage: Number,
   busContracts: Array,
+  recentContacts: Array,
 })
 
 const allTeachersList = ref([...props.allTeachers])

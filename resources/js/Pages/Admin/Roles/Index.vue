@@ -264,7 +264,7 @@ const roleDotClass = (name) => {
   return map[name] || 'bg-slate-400'
 }
 
-const isProtected = (name) => ['admin', 'teacher'].includes(name)
+const isProtected = (name) => ['admin'].includes(name)
 
 const editRole = (role) => {
   if (isProtected(role.name)) {

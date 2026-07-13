@@ -44,7 +44,7 @@ class RolePermissionController extends Controller
 
     public function updateRole(Request $request, Role $role)
     {
-        if (in_array($role->name, ['admin', 'teacher'])) {
+        if (in_array($role->name, ['admin'])) {
             return redirect()->back()->with('error', 'لا يمكن تعديل الأدوار الأساسية');
         }
 

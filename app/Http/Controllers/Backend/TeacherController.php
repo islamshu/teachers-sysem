@@ -81,6 +81,8 @@ class TeacherController extends Controller
             'role' => 'teacher',
         ]);
 
+        $user->assignRole('teacher');
+
         unset($data['name'], $data['email'], $data['password']);
 
         if ($request->hasFile('photo')) {

@@ -82,6 +82,57 @@
           </div>
         </div>
 
+        <!-- Hero Section -->
+        <div class="card p-6 animate-fade-in-up animate-delay-150">
+          <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            قسم البطل (Hero)
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">العنوان الرئيسي</label>
+              <input v-model="form.hero_title" type="text" class="input-base" placeholder="مثال: مرحباً بكم في منصتنا" />
+              <p v-if="form.errors.hero_title" class="text-red-500 text-xs mt-1">{{ form.errors.hero_title }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">النص الفرعي</label>
+              <input v-model="form.hero_subtitle" type="text" class="input-base" placeholder="وصف قصير يظهر تحت العنوان" />
+              <p v-if="form.errors.hero_subtitle" class="text-red-500 text-xs mt-1">{{ form.errors.hero_subtitle }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">لون الخلفية - البداية</label>
+              <div class="flex gap-3 items-center">
+                <input v-model="form.hero_bg_from" type="color" class="w-10 h-10 rounded-xl border border-surface-200 cursor-pointer" />
+                <input v-model="form.hero_bg_from" type="text" class="input flex-1" placeholder="#1e40af" dir="ltr" />
+              </div>
+              <p v-if="form.errors.hero_bg_from" class="text-red-500 text-xs mt-1">{{ form.errors.hero_bg_from }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">لون الخلفية - النهاية</label>
+              <div class="flex gap-3 items-center">
+                <input v-model="form.hero_bg_to" type="color" class="w-10 h-10 rounded-xl border border-surface-200 cursor-pointer" />
+                <input v-model="form.hero_bg_to" type="text" class="input flex-1" placeholder="#7c3aed" dir="ltr" />
+              </div>
+              <p v-if="form.errors.hero_bg_to" class="text-red-500 text-xs mt-1">{{ form.errors.hero_bg_to }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <input
+                v-model="form.show_stats"
+                type="checkbox"
+                id="show_stats"
+                class="w-5 h-5 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+                :true-value="'1'"
+                :false-value="'0'"
+              />
+              <label for="show_stats" class="text-sm font-bold text-slate-700">إظهار إحصائيات (عدد المدرسين والمواد)</label>
+            </div>
+          </div>
+        </div>
+
         <!-- About Section -->
         <div class="card p-6 animate-fade-in-up animate-delay-200">
           <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
@@ -134,6 +185,11 @@ const form = useForm({
   contact_phone: props.settings.contact_phone || '',
   address: props.settings.address || '',
   about: props.settings.about || '',
+  hero_title: props.settings.hero_title || '',
+  hero_subtitle: props.settings.hero_subtitle || '',
+  hero_bg_from: props.settings.hero_bg_from || '#1e40af',
+  hero_bg_to: props.settings.hero_bg_to || '#7c3aed',
+  show_stats: props.settings.show_stats ?? '1',
 })
 
 const logoPreview = ref(null)

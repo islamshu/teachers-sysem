@@ -26,7 +26,6 @@
               <tr class="bg-surface-50 border-b border-surface-200">
                 <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">الموظف</th>
                 <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">البريد الإلكتروني</th>
-                <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">المدرسة</th>
                 <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">الفروع</th>
                 <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">الأدوار</th>
                 <th class="px-6 py-4 text-center text-sm font-bold text-slate-700">الإجراءات</th>
@@ -44,12 +43,6 @@
                 </td>
                 <td class="px-6 py-4 text-sm text-slate-600">{{ employee.email }}</td>
                 <td class="px-6 py-4">
-                  <span v-if="employee.school" class="inline-flex px-2.5 py-0.5 rounded-lg bg-blue-100 text-blue-700 text-xs font-semibold">
-                    {{ employee.school.name }}
-                  </span>
-                  <span v-else class="text-sm text-slate-400">-</span>
-                </td>
-                <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1.5">
                     <span
                       v-for="branch in employee.branches"
@@ -64,7 +57,7 @@
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1.5">
                     <span
-                      v-for="role in employee.roles"
+                      v-for="role in employee.roles.filter(r => r.name !== 'teacher')"
                       :key="role.id"
                       class="inline-flex px-2.5 py-0.5 rounded-lg bg-primary-100 text-primary-700 text-xs font-semibold"
                     >
@@ -94,7 +87,7 @@
                 </td>
               </tr>
               <tr v-if="filteredList.length === 0">
-                <td colspan="7" class="px-6 py-12 text-center text-slate-500">لا يوجد موظفون بعد</td>
+                <td colspan="6" class="px-6 py-12 text-center text-slate-500">لا يوجد موظفون بعد</td>
               </tr>
             </tbody>
           </table>
@@ -224,16 +217,6 @@
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-semibold text-slate-700 mb-1.5">المدرسة <span class="text-red-500">*</span></label>
-              <select v-model="form.school_id" class="input-base" required>
-                <option value="">اختر المدرسة</option>
-                <option v-for="school in schools" :key="school.id" :value="school.id">
-                  {{ school.school_profile?.school_name || school.name }}
-                </option>
-              </select>
-            </div>
-
-            <div class="mb-4">
               <label class="block text-sm font-semibold text-slate-700 mb-2">الفروع <span class="text-red-500">*</span></label>
               <div class="space-y-2 max-h-40 overflow-y-auto p-3 bg-surface-50 rounded-xl">
                 <label
@@ -257,7 +240,7 @@
               <label class="block text-sm font-semibold text-slate-700 mb-2">الأدوار <span class="text-red-500">*</span></label>
               <div class="space-y-2 max-h-40 overflow-y-auto p-3 bg-surface-50 rounded-xl">
                 <label
-                  v-for="role in roles"
+                  v-for="role in roles.filter(r => r.name !== 'teacher')"
                   :key="role.id"
                   class="flex items-center gap-3 cursor-pointer group"
                 >
@@ -297,7 +280,6 @@ const props = defineProps({
   employees: Array,
   branches: Array,
   roles: Array,
-  schools: Array,
 })
 
 const page = usePage()
@@ -334,7 +316,6 @@ const form = useForm({
   name: '',
   email: '',
   password: '',
-  school_id: '',
   branch_ids: [],
   role_ids: [],
 })
@@ -354,7 +335,6 @@ const openAddModal = () => {
   form.name = ''
   form.email = ''
   form.password = ''
-  form.school_id = ''
   form.branch_ids = []
   form.role_ids = []
   showModal.value = true
@@ -365,7 +345,6 @@ const openEditModal = (employee) => {
   form.name = employee.name
   form.email = employee.email
   form.password = ''
-  form.school_id = employee.school_id || ''
   form.branch_ids = employee.branches?.map(b => b.id) || []
   form.role_ids = employee.roles?.map(r => r.id) || []
   showModal.value = true
@@ -413,8 +392,7 @@ const formatTime = (datetime) => {
 
 const submitForm = () => {
   if (editingEmployee.value) {
-    form.post(`/admin/employees/${editingEmployee.value.id}`, {
-      _method: 'PUT',
+    form.put(`/admin/employees/${editingEmployee.value.id}`, {
       onSuccess: () => closeModal(),
     })
   } else {

@@ -463,6 +463,48 @@
                   </div>
                   <span>المدرسون المعينون</span>
                 </Link>
+
+                <div class="border-t border-surface-200 my-3"></div>
+                <p class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">الموظفون</p>
+
+                <Link
+                  href="/school/employees/browse"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="isActive('/school/employees/browse') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employees/browse') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <span>تصفح الموظفين</span>
+                </Link>
+
+                <Link
+                  href="/school/employee-invitations"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="isActive('/school/employee-invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employee-invitations') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span>دعوات الموظفين</span>
+                </Link>
+
+                <Link
+                  href="/school/employee-hired"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                  :class="isActive('/school/employee-hired') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/school/employee-hired') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span>الموظفون المعينون</span>
+                </Link>
               </template>
               </template>
 
@@ -563,6 +605,53 @@
             </nav>
           </template>
 
+          <!-- Employee Navigation -->
+          <template v-if="$page.props.auth.user?.role !== 'teacher' && $page.props.auth.user?.role !== 'school' && $page.props.auth.user?.role !== 'admin' && !$page.props.auth.user?.is_admin">
+            <div class="mb-6">
+              <div class="flex items-center gap-3 px-3 py-3 mb-2">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-sm">
+                  👷
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-slate-900">لوحة الموظف</p>
+                  <p class="text-xs text-slate-500">مرحباً، {{ $page.props.auth.user?.name }}</p>
+                </div>
+              </div>
+            </div>
+
+            <nav class="space-y-1">
+              <Link
+                v-if="$page.props.auth.permissions?.includes('عرض لوحة التحكم')"
+                href="/dashboard"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/dashboard') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/dashboard') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </div>
+                <span>لوحة التحكم</span>
+              </Link>
+
+              <div class="border-t border-surface-200 my-3"></div>
+              <p class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">التوظيف</p>
+
+              <Link
+                href="/employee/invitations"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                :class="isActive('/employee/invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+              >
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/employee/invitations') ? 'bg-primary-100' : 'bg-surface-100'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span>دعوات التوظيف</span>
+              </Link>
+            </nav>
+          </template>
+
           <!-- Universal Navigation for all users -->
           <nav class="space-y-1 mt-3 border-t border-surface-200 pt-3">
             <div v-if="$page.props.auth.user?.role !== 'school' && $page.props.auth.permissions?.includes('إجراء المقابلات')">
@@ -607,6 +696,30 @@
                 >
                   <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                   المدرسون المعينون
+                </Link>
+                <Link
+                  href="/school/employees/browse"
+                  class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                  :class="isActive('/school/employees/browse') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                  تصفح الموظفين
+                </Link>
+                <Link
+                  href="/school/employee-invitations"
+                  class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                  :class="isActive('/school/employee-invitations') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                  دعوات الموظفين
+                </Link>
+                <Link
+                  href="/school/employee-hired"
+                  class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                  :class="isActive('/school/employee-hired') ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                >
+                  <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                  الموظفون المعينون
                 </Link>
               </div>
             </div>
@@ -797,7 +910,7 @@ const tasksActive = computed(() =>
 )
 
 const hiringActive = computed(() =>
-  ['School/TeachersIndex', 'School/Invitations', 'School/ConductInterview', 'School/InterviewResult', 'School/Employees'].includes(page.component)
+  ['School/TeachersIndex', 'School/Invitations', 'School/ConductInterview', 'School/InterviewResult', 'School/Employees', 'School/EmployeesBrowse', 'School/EmployeeInvitations', 'School/EmployeeConductInterview', 'School/EmployeeInterviewResult', 'School/EmployeeHired'].includes(page.component)
 )
 
 const isActive = (href) => {

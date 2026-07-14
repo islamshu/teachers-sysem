@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\UserBalance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -26,9 +27,8 @@ class HandleInertiaRequests extends Middleware
         if ($user) {
             if ($user->isSchool()) {
                 $user->load('schoolProfile', 'roles');
-            } elseif ($user->isEmployee()) {
-                $user->load('branches', 'roles', 'school');
             } else {
+                // All providers (teacher, employee, etc.) need teacherProfile
                 $user->load('teacherProfile.subject', 'teacherProfile.grades', 'roles');
             }
         }
@@ -67,12 +67,18 @@ class HandleInertiaRequests extends Middleware
 
         $hasBalance = $user ? UserBalance::where('user_id', $user->id)->where('balance', '>', 0)->exists() : false;
 
+        $spatieRoles = \Spatie\Permission\Models\Role::where('name', '!=', 'admin')
+            ->orderBy('name')
+            ->get(['name', 'id'])
+            ->toArray();
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $user,
                 'permissions' => $user ? $user->getAllPermissions()->pluck('name') : [],
             ],
+            'spatieRoles' => $spatieRoles,
             'badges' => $badges,
             'hasBalance' => $hasBalance,
             'locale' => session('locale', 'ar'),

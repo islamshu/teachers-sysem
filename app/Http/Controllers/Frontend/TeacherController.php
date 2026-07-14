@@ -17,6 +17,11 @@ class TeacherController extends Controller
         if ($request->wantsJson()) {
             $query = TeacherProfile::with(['user', 'subject', 'grades'])
                 ->where('status', 'approved')
+                ->when($request->job_title && $request->job_title !== 'all', function ($q) use ($request) {
+                    $q->whereHas('user', function ($q2) use ($request) {
+                        $q2->where('job_title', $request->job_title);
+                    });
+                })
                 ->when($request->subject_id, function ($query) use ($request) {
                     $query->where('subject_id', $request->subject_id);
                 })
@@ -39,18 +44,25 @@ class TeacherController extends Controller
         $features = \App\Models\Feature::active()->ordered()->get();
         $testimonials = \App\Models\Testimonial::active()->ordered()->get();
         $steps = \App\Models\Step::active()->ordered()->get();
-        $totalTeachers = TeacherProfile::where('status', 'approved')->count();
+        $totalProviders = TeacherProfile::where('status', 'approved')->count();
         $totalSchools = SchoolProfile::count();
         $subjects = Subject::orderBy('name')->get();
+
+        $roles = \Spatie\Permission\Models\Role::where('name', '!=', 'admin')
+            ->orderBy('name')
+            ->get(['name'])
+            ->pluck('name')
+            ->toArray();
 
         return Inertia::render('Home', [
             'slides' => $slides,
             'features' => $features,
             'testimonials' => $testimonials,
             'steps' => $steps,
-            'totalTeachers' => $totalTeachers,
+            'totalProviders' => $totalProviders,
             'totalSchools' => $totalSchools,
             'subjects' => $subjects,
+            'availableRoles' => $roles,
         ]);
     }
 

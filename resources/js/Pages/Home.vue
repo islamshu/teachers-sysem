@@ -104,8 +104,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <div class="text-4xl md:text-5xl font-extrabold text-primary-600 mb-2">{{ totalTeachers }}+</div>
-            <div class="text-slate-500 font-medium">مدرس معتمد</div>
+            <div class="text-4xl md:text-5xl font-extrabold text-primary-600 mb-2">{{ totalProviders }}+</div>
+            <div class="text-slate-500 font-medium">مقدم وظائف</div>
           </div>
 
           <div class="card p-8 text-center hover:shadow-lg transition-shadow duration-300">
@@ -130,8 +130,155 @@
         </div>
       </div>
 
+      <!-- Providers Browsing Section -->
+      <div class="mb-12 animate-fade-in-up animate-delay-150">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 text-center mb-4">مقدمو الوظائف</h2>
+        <p class="text-slate-500 text-center mb-8">تصفح مقدمي الوظائف المتاحين</p>
+
+        <!-- Role Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-2 justify-center mb-8">
+          <button
+            @click="activeRole = 'all'"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+            :class="activeRole === 'all'
+              ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
+              : 'bg-surface-100 text-slate-600 hover:bg-surface-200'"
+          >
+            الكل
+          </button>
+          <button
+            @click="activeRole = 'teacher'"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+            :class="activeRole === 'teacher'
+              ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
+              : 'bg-surface-100 text-slate-600 hover:bg-surface-200'"
+          >
+            معلم
+          </button>
+          <button
+            v-for="role in availableRoles"
+            :key="role"
+            @click="activeRole = role"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+            :class="activeRole === role
+              ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
+              : 'bg-surface-100 text-slate-600 hover:bg-surface-200'"
+          >
+            {{ role }}
+          </button>
+        </div>
+
+        <!-- Search -->
+        <div class="max-w-md mx-auto mb-8">
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="بحث بالاسم..."
+              class="input-base pl-10"
+              @input="debouncedSearch"
+            />
+            <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Providers Grid -->
+        <div v-if="providers.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            v-for="provider in providers"
+            :key="provider.id"
+            class="card p-6 hover:shadow-lg transition-all duration-300 group"
+          >
+            <div class="flex items-start gap-4">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-surface-100 overflow-hidden flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                <img v-if="provider.photo" :src="`/storage/${provider.photo}`" :alt="provider.user?.name" class="w-full h-full object-cover" />
+                <div v-else class="w-full h-full flex items-center justify-center text-2xl font-bold text-primary-600">
+                  {{ provider.user?.name?.charAt(0) }}
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-slate-900 truncate">{{ provider.user?.name }}</h3>
+                <div class="flex items-center gap-2 mt-1">
+                  <span
+                    class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold"
+                    :class="getRoleBadgeClass(provider.user?.job_title)"
+                  >
+                    {{ getRoleLabel(provider.user?.job_title) }}
+                  </span>
+                  <span v-if="provider.subject" class="badge-primary text-xs">{{ provider.subject?.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div v-if="provider.qualification" class="flex items-center gap-2 text-sm text-slate-600">
+                <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z" />
+                </svg>
+                <span class="truncate">{{ provider.qualification }}</span>
+              </div>
+              <div v-if="provider.residence_place" class="flex items-center gap-2 text-sm text-slate-600">
+                <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                <span class="truncate">{{ provider.residence_place }}</span>
+              </div>
+              <div v-if="provider.experience_years" class="flex items-center gap-2 text-sm text-slate-600">
+                <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ provider.experience_years }} سنة خبرة</span>
+              </div>
+            </div>
+
+            <div v-if="provider.grades?.length" class="mt-3 flex flex-wrap gap-1">
+              <span
+                v-for="grade in provider.grades.slice(0, 3)"
+                :key="grade.id"
+                class="inline-block px-2 py-0.5 bg-surface-100 text-surface-600 rounded text-xs font-medium"
+              >
+                {{ grade.name }}
+              </span>
+              <span v-if="provider.grades.length > 3" class="inline-block px-2 py-0.5 bg-surface-100 text-surface-500 rounded text-xs">
+                +{{ provider.grades.length - 3 }}
+              </span>
+            </div>
+
+            <Link
+              :href="`/teachers/${provider.id}`"
+              class="mt-4 w-full btn-secondary text-xs py-2 justify-center"
+            >
+              عرض الملف الشخصي
+            </Link>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="card p-10 text-center">
+          <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-1">لا يوجد مقدمو وظائف</h3>
+          <p class="text-sm text-slate-500">لم يتم العثور على مقدمي وظائف بهذا التصنيف</p>
+        </div>
+
+        <!-- Load More -->
+        <div v-if="nextPage" class="text-center mt-8">
+          <button @click="loadMore" :disabled="loadingMore" class="btn-secondary px-8">
+            <svg v-if="loadingMore" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            تحميل المزيد
+          </button>
+        </div>
+      </div>
+
       <!-- Features Section -->
-      <div v-if="activeFeatures.length > 0" class="mb-12 animate-fade-in-up animate-delay-150">
+      <div v-if="activeFeatures.length > 0" class="mb-12 animate-fade-in-up animate-delay-200">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 text-center mb-10">لماذا نحن؟</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div v-for="f in activeFeatures" :key="f.id" class="card p-6 text-center hover:shadow-lg transition-shadow duration-300 group">
@@ -168,7 +315,7 @@
       </div>
 
       <!-- Testimonials Section -->
-      <div v-if="activeTestimonials.length > 0" class="mb-12 animate-fade-in-up animate-delay-200">
+      <div v-if="activeTestimonials.length > 0" class="mb-12 animate-fade-in-up animate-delay-250">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 text-center mb-10">ماذا يقول عنا المستخدمون</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="t in activeTestimonials" :key="t.id" class="card p-6 relative">
@@ -277,8 +424,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { usePage, useForm } from '@inertiajs/vue3'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { usePage, useForm, Link } from '@inertiajs/vue3'
 import MainLayout from '@/Layouts/MainLayout.vue'
 
 const props = defineProps({
@@ -286,9 +433,13 @@ const props = defineProps({
   features: Array,
   testimonials: Array,
   steps: Array,
-  totalTeachers: Number,
+  totalProviders: Number,
   totalSchools: Number,
   subjects: Array,
+  availableRoles: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const page = usePage()
@@ -339,12 +490,68 @@ const onImageError = (e) => {
   e.target.style.display = 'none'
 }
 
-const goToSlide = (i) => {
-  stopSlideTimer()
-  currentSlide.value = i
-  startSlideTimer()
+// Providers browsing
+const activeRole = ref('all')
+const searchQuery = ref('')
+const providers = ref([])
+const nextPage = ref(null)
+const loadingMore = ref(false)
+
+const fetchProviders = async (page = 1, append = false) => {
+  const params = new URLSearchParams()
+  params.set('page', page)
+  if (activeRole.value !== 'all') params.set('job_title', activeRole.value)
+  if (searchQuery.value) params.set('search', searchQuery.value)
+
+  try {
+    const res = await fetch(`/?${params.toString()}`, {
+      headers: { 'Accept': 'application/json' },
+    })
+    const data = await res.json()
+    if (append) {
+      providers.value = [...providers.value, ...data.data]
+    } else {
+      providers.value = data.data
+    }
+    nextPage.value = data.next_page_url ? data.current_page + 1 : null
+  } catch (e) {
+    console.error('Failed to fetch providers', e)
+  }
 }
 
+let searchTimeout = null
+const debouncedSearch = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    fetchProviders(1)
+  }, 400)
+}
+
+const loadMore = () => {
+  if (!nextPage.value || loadingMore.value) return
+  loadingMore.value = true
+  fetchProviders(nextPage.value, true).finally(() => {
+    loadingMore.value = false
+  })
+}
+
+watch(activeRole, () => {
+  fetchProviders(1)
+})
+
+const getRoleLabel = (jobTitle) => {
+  if (!jobTitle || jobTitle === 'teacher') return 'معلم'
+  return jobTitle
+}
+
+const getRoleBadgeClass = (jobTitle) => {
+  if (!jobTitle || jobTitle === 'teacher') return 'bg-primary-100 text-primary-700'
+  if (jobTitle === 'employee') return 'bg-amber-100 text-amber-700'
+  if (jobTitle === 'school') return 'bg-emerald-100 text-emerald-700'
+  return 'bg-surface-100 text-surface-700'
+}
+
+// Contact form
 const contactForm = useForm({
   name: '',
   email: '',
@@ -363,6 +570,7 @@ const submitContact = () => {
 
 onMounted(() => {
   startSlideTimer()
+  fetchProviders(1)
 })
 
 onUnmounted(() => {

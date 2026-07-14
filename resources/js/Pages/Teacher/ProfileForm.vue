@@ -3,8 +3,12 @@
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8 animate-fade-in-up">
-        <h1 class="text-3xl font-extrabold text-slate-900 mb-2">{{ $t('messages.add_profile_btn') }}</h1>
-        <p class="text-slate-500">{{ $t('messages.bio_placeholder') }}</p>
+        <h1 class="text-3xl font-extrabold text-slate-900 mb-2">
+          {{ isTeacher ? $t('messages.add_profile_btn') : 'إكمال الملف الشخصي' }}
+        </h1>
+        <p class="text-slate-500">
+          {{ isTeacher ? $t('messages.bio_placeholder') : 'أكمل بياناتك الشخصية' }}
+        </p>
       </div>
 
       <!-- Alert -->
@@ -15,7 +19,7 @@
         <form @submit.prevent="submit" class="p-8 space-y-8">
           <!-- Photo Upload -->
           <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.photo') }} <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-bold text-slate-700 mb-2">{{ $t('messages.photo') }}</label>
             <div class="relative">
               <div class="flex items-center gap-4">
                 <div class="w-24 h-24 rounded-2xl bg-surface-100 overflow-hidden flex-shrink-0 border-2 border-dashed border-surface-300">
@@ -84,77 +88,121 @@
             </div>
           </div>
 
-          <!-- Academic Information -->
-          <div class="divider"></div>
+          <!-- Academic Information (ONLY for teachers) -->
+          <template v-if="isTeacher">
+            <div class="divider"></div>
 
-          <div>
-            <div class="flex items-center gap-3 mb-6">
-              <div class="w-10 h-10 rounded-xl bg-warm-100 flex items-center justify-center">
-                <svg class="w-5 h-5 text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z" />
-                </svg>
-              </div>
-              <h3 class="text-lg font-bold text-slate-900">{{ $t('messages.academic_info') }}</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.subject') }} <span class="text-red-500">*</span></label>
-                <select v-model="form.subject_id" class="input-base" :class="{ 'input-error': form.errors.subject_id }">
-                  <option value="">{{ $t('messages.select_subject') }}</option>
-                  <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
-                    {{ subject.name }}
-                  </option>
-                </select>
-                <p v-if="form.errors.subject_id" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.subject_id }}</p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.experience_years') }} <span class="text-red-500">*</span></label>
-                <input
-                  v-model="form.experience_years"
-                  type="number"
-                  min="0"
-                  class="input-base"
-                  :class="{ 'input-error': form.errors.experience_years }"
-                />
-                <p v-if="form.errors.experience_years" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.experience_years }}</p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.qualification') }} <span class="text-red-500">*</span></label>
-                <input
-                  v-model="form.qualification"
-                  type="text"
-                  :placeholder="$t('messages.qualification_placeholder')"
-                  class="input-base"
-                  :class="{ 'input-error': form.errors.qualification }"
-                />
-                <p v-if="form.errors.qualification" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.qualification }}</p>
-              </div>
-
-              <div class="md:col-span-2">
-                <label class="block text-sm font-semibold text-slate-700 mb-3">{{ $t('messages.grade') }} <span class="text-red-500">*</span></label>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  <label
-                    v-for="grade in grades"
-                    :key="grade.id"
-                    class="relative flex items-center gap-3 p-3 rounded-xl border-2 border-surface-200 cursor-pointer transition-all duration-200"
-                    :class="{ 'border-primary-400 bg-primary-50': form.grade_ids.includes(grade.id) }"
-                  >
-                    <input
-                      type="checkbox"
-                      :value="grade.id"
-                      v-model="form.grade_ids"
-                      class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
-                    />
-                    <span class="text-sm font-medium text-slate-700">{{ grade.name }}</span>
-                  </label>
+            <div>
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-warm-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z" />
+                  </svg>
                 </div>
-                <p v-if="form.errors.grade_ids" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.grade_ids }}</p>
+                <h3 class="text-lg font-bold text-slate-900">{{ $t('messages.academic_info') }}</h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.subject') }} <span class="text-red-500">*</span></label>
+                  <select v-model="form.subject_id" class="input-base" :class="{ 'input-error': form.errors.subject_id }">
+                    <option value="">{{ $t('messages.select_subject') }}</option>
+                    <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
+                      {{ subject.name }}
+                    </option>
+                  </select>
+                  <p v-if="form.errors.subject_id" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.subject_id }}</p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.experience_years') }} <span class="text-red-500">*</span></label>
+                  <input
+                    v-model="form.experience_years"
+                    type="number"
+                    min="0"
+                    class="input-base"
+                    :class="{ 'input-error': form.errors.experience_years }"
+                  />
+                  <p v-if="form.errors.experience_years" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.experience_years }}</p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.qualification') }} <span class="text-red-500">*</span></label>
+                  <input
+                    v-model="form.qualification"
+                    type="text"
+                    :placeholder="$t('messages.qualification_placeholder')"
+                    class="input-base"
+                    :class="{ 'input-error': form.errors.qualification }"
+                  />
+                  <p v-if="form.errors.qualification" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.qualification }}</p>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-3">{{ $t('messages.grade') }} <span class="text-red-500">*</span></label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <label
+                      v-for="grade in grades"
+                      :key="grade.id"
+                      class="relative flex items-center gap-3 p-3 rounded-xl border-2 border-surface-200 cursor-pointer transition-all duration-200"
+                      :class="{ 'border-primary-400 bg-primary-50': form.grade_ids.includes(grade.id) }"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="grade.id"
+                        v-model="form.grade_ids"
+                        class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span class="text-sm font-medium text-slate-700">{{ grade.name }}</span>
+                    </label>
+                  </div>
+                  <p v-if="form.errors.grade_ids" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.grade_ids }}</p>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
+
+          <!-- Experience & Qualification (for non-teachers) -->
+          <template v-else>
+            <div class="divider"></div>
+
+            <div>
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-warm-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">المعلومات المهنية</h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.experience_years') }} <span class="text-red-500">*</span></label>
+                  <input
+                    v-model="form.experience_years"
+                    type="number"
+                    min="0"
+                    class="input-base"
+                    :class="{ 'input-error': form.errors.experience_years }"
+                  />
+                  <p v-if="form.errors.experience_years" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.experience_years }}</p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ $t('messages.qualification') }} <span class="text-red-500">*</span></label>
+                  <input
+                    v-model="form.qualification"
+                    type="text"
+                    :placeholder="$t('messages.qualification_placeholder')"
+                    class="input-base"
+                    :class="{ 'input-error': form.errors.qualification }"
+                  />
+                  <p v-if="form.errors.qualification" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.qualification }}</p>
+                </div>
+              </div>
+            </div>
+          </template>
 
           <!-- Practical Experience -->
           <div class="divider"></div>
@@ -250,7 +298,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useForm, Link } from '@inertiajs/vue3'
 import MainLayout from '@/Layouts/MainLayout.vue'
 import Alert from '@/Components/Alert.vue'
@@ -259,7 +307,10 @@ const props = defineProps({
   subjects: Array,
   grades: Array,
   profile: Object,
+  jobTitle: String,
 })
+
+const isTeacher = computed(() => (props.jobTitle || 'teacher') === 'teacher')
 
 const photoPreview = ref(props.profile?.photo ? `/storage/${props.profile.photo}` : null)
 

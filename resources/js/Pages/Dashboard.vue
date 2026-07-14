@@ -33,7 +33,7 @@
                 <h3 class="text-2xl font-bold text-slate-900 mb-2">{{ $t('messages.no_profile_title') }}</h3>
                 <p class="text-slate-500 mb-8 max-w-md mx-auto">{{ $t('messages.no_profile_desc') }}</p>
                 <Link
-                  href="/teacher-profile/create"
+                  href="/complete-profile/create"
                   class="btn-primary text-base px-8 py-3"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,13 +50,25 @@
                     <div class="relative flex-shrink-0">
                     <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-surface-100 overflow-hidden shadow-lg shadow-primary-500/10">
                       <img v-if="profile.photo" :src="`/storage/${profile.photo}`" :alt="$page.props.auth.user?.name" class="w-full h-full object-cover" />
-                      <div v-else class="w-full h-full flex items-center justify-center text-2xl md:text-3xl">👨‍🏫</div>
+                      <div v-else class="w-full h-full flex items-center justify-center text-2xl md:text-3xl">
+                        {{ isTeacher ? '👨‍🏫' : '👤' }}
+                      </div>
                     </div>
                   </div>
                   <div class="flex-1 min-w-0 w-full">
                     <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-3 mb-4">
                       <div class="text-center sm:text-right w-full">
                         <h3 class="text-xl md:text-2xl font-bold text-slate-900">{{ $page.props.auth.user?.name }}</h3>
+
+                        <!-- Role Badge -->
+                        <div class="mt-2">
+                          <span
+                            class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
+                            :class="isTeacher ? 'bg-primary-100 text-primary-700' : 'bg-amber-100 text-amber-700'"
+                          >
+                            {{ isTeacher ? 'معلم' : ($page.props.auth.user?.job_title || $page.props.auth.user?.role) }}
+                          </span>
+                        </div>
 
                         <!-- Status Badge -->
                         <div class="mt-3 p-3 md:p-4 rounded-2xl border-2 text-right" :class="statusCardClass">
@@ -90,38 +102,59 @@
                       </Link>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                      <div class="p-3 rounded-xl bg-primary-50">
-                        <p class="text-xs text-primary-600 font-semibold mb-0.5">{{ $t('messages.subject') }}</p>
-                        <p class="text-sm font-bold text-slate-900">{{ profile.subject?.name || '-' }}</p>
+                    <!-- Teacher-specific info -->
+                    <template v-if="isTeacher">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-3 rounded-xl bg-primary-50">
+                          <p class="text-xs text-primary-600 font-semibold mb-0.5">{{ $t('messages.subject') }}</p>
+                          <p class="text-sm font-bold text-slate-900">{{ profile.subject?.name || '-' }}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-warm-50">
+                          <p class="text-xs text-warm-600 font-semibold mb-0.5">{{ $t('messages.experience') }}</p>
+                          <p class="text-sm font-bold text-slate-900">{{ profile.experience_years || 0 }} {{ $t('messages.year') }}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-50">
+                          <p class="text-xs text-emerald-600 font-semibold mb-0.5">{{ $t('messages.qualification') }}</p>
+                          <p class="text-sm font-bold text-slate-900 truncate">{{ profile.qualification || '-' }}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-rose-50">
+                          <p class="text-xs text-rose-600 font-semibold mb-0.5">{{ $t('messages.location') }}</p>
+                          <p class="text-sm font-bold text-slate-900 truncate">{{ profile.residence_place || '-' }}</p>
+                        </div>
                       </div>
-                      <div class="p-3 rounded-xl bg-warm-50">
-                        <p class="text-xs text-warm-600 font-semibold mb-0.5">{{ $t('messages.experience') }}</p>
-                        <p class="text-sm font-bold text-slate-900">{{ profile.experience_years || 0 }} {{ $t('messages.year') }}</p>
-                      </div>
-                      <div class="p-3 rounded-xl bg-emerald-50">
-                        <p class="text-xs text-emerald-600 font-semibold mb-0.5">{{ $t('messages.qualification') }}</p>
-                        <p class="text-sm font-bold text-slate-900 truncate">{{ profile.qualification || '-' }}</p>
-                      </div>
-                      <div class="p-3 rounded-xl bg-rose-50">
-                        <p class="text-xs text-rose-600 font-semibold mb-0.5">{{ $t('messages.location') }}</p>
-                        <p class="text-sm font-bold text-slate-900 truncate">{{ profile.residence_place || '-' }}</p>
-                      </div>
-                    </div>
 
-                    <div class="mt-4 text-center sm:text-right">
-                      <p class="text-xs text-slate-500 font-semibold mb-2">{{ $t('messages.grades_teaching') }}</p>
-                      <div class="flex flex-wrap gap-1.5 justify-center sm:justify-start">
-                        <span
-                          v-for="grade in profile.grades"
-                          :key="grade.id"
-                          class="inline-block px-3 py-1 bg-surface-100 text-surface-700 rounded-lg text-xs font-medium"
-                        >
-                          {{ grade.name }}
-                        </span>
-                        <span v-if="!profile.grades?.length" class="text-sm text-slate-400">-</span>
+                      <div class="mt-4 text-center sm:text-right">
+                        <p class="text-xs text-slate-500 font-semibold mb-2">{{ $t('messages.grades_teaching') }}</p>
+                        <div class="flex flex-wrap gap-1.5 justify-center sm:justify-start">
+                          <span
+                            v-for="grade in profile.grades"
+                            :key="grade.id"
+                            class="inline-block px-3 py-1 bg-surface-100 text-surface-700 rounded-lg text-xs font-medium"
+                          >
+                            {{ grade.name }}
+                          </span>
+                          <span v-if="!profile.grades?.length" class="text-sm text-slate-400">-</span>
+                        </div>
                       </div>
-                    </div>
+                    </template>
+
+                    <!-- Non-teacher info -->
+                    <template v-else>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="p-3 rounded-xl bg-warm-50">
+                          <p class="text-xs text-warm-600 font-semibold mb-0.5">{{ $t('messages.experience') }}</p>
+                          <p class="text-sm font-bold text-slate-900">{{ profile.experience_years || 0 }} {{ $t('messages.year') }}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-50">
+                          <p class="text-xs text-emerald-600 font-semibold mb-0.5">{{ $t('messages.qualification') }}</p>
+                          <p class="text-sm font-bold text-slate-900 truncate">{{ profile.qualification || '-' }}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-rose-50">
+                          <p class="text-xs text-rose-600 font-semibold mb-0.5">{{ $t('messages.location') }}</p>
+                          <p class="text-sm font-bold text-slate-900 truncate">{{ profile.residence_place || '-' }}</p>
+                        </div>
+                      </div>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -202,6 +235,11 @@ import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 
 const page = usePage()
 const profile = computed(() => page.props.auth.user?.teacher_profile)
+const isTeacher = computed(() => {
+  const jobTitle = page.props.auth.user?.job_title
+  const role = page.props.auth.user?.role
+  return (jobTitle || role) === 'teacher'
+})
 
 const statusCardClass = computed(() => {
   const map = {
@@ -251,7 +289,9 @@ const statusText = computed(() => {
 const statusDescription = computed(() => {
   const map = {
     pending: 'بياناتك قيد المراجعة من قبل الإدارة، سيتم إخطارك عند القبول',
-    approved: 'تم قبول بياناتك وستظهر في قائمة المدرسين المتاحين',
+    approved: isTeacher.value
+      ? 'تم قبول بياناتك وستظهر في قائمة المدرسين المتاحين'
+      : 'تم قبول بياناتك وستظهر في قائمة مقدمي الوظائف',
     rejected: 'لم يتم قبول بياناتك، يمكنك تعديلها وإعادة التقديم',
   }
   return map[profile.value?.status] || ''

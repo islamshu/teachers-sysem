@@ -34,6 +34,7 @@
         <Alert v-if="form.errors.email" variant="error" title="خطأ" :description="form.errors.email" class="mb-6" />
         <Alert v-if="form.errors.password" variant="error" title="خطأ" :description="form.errors.password" class="mb-6" />
         <Alert v-if="form.errors.name" variant="error" title="خطأ" :description="form.errors.name" class="mb-6" />
+        <Alert v-if="form.errors.job_title" variant="error" title="خطأ" :description="form.errors.job_title" class="mb-6" />
 
         <form @submit.prevent="submit">
           <!-- Name -->
@@ -48,6 +49,19 @@
           <div class="mt-5">
             <label for="email" class="block text-sm font-bold text-slate-700 mb-1.5">البريد الإلكتروني <span class="text-red-500">*</span></label>
             <input id="email" v-model="form.email" type="email" class="input-base" placeholder="teacher@example.com" required autocomplete="username" />
+          </div>
+
+          <!-- Job Title (Role) -->
+          <div class="mt-5">
+            <label for="job_title" class="block text-sm font-bold text-slate-700 mb-1.5">المسمى الوظيفي <span class="text-red-500">*</span></label>
+            <select id="job_title" v-model="form.job_title" class="input-base" :class="{ 'input-error': form.errors.job_title }" required>
+              <option value="">اختر المسمى الوظيفي</option>
+              <option value="teacher">معلم</option>
+              <option v-for="role in roles" :key="role.name" :value="role.name">
+                {{ role.name }}
+              </option>
+            </select>
+            <p v-if="form.errors.job_title" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.job_title }}</p>
           </div>
 
           <!-- Password -->
@@ -92,11 +106,19 @@
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 import Alert from '@/Components/Alert.vue'
 
+const props = defineProps({
+  roles: {
+    type: Array,
+    default: () => [],
+  },
+})
+
 const form = useForm({
   name: '',
   email: '',
   password: '',
   password_confirmation: '',
+  job_title: '',
 })
 
 const submit = () => {

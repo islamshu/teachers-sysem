@@ -27,7 +27,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Backend\BalanceController;
 use App\Http\Controllers\Backend\PurchaseController as AdminPurchaseController;
 use App\Http\Controllers\Employee\PurchaseController as EmployeePurchaseController;
+use App\Http\Controllers\Employee\InvitationController as EmployeeInvitationController;
 use App\Http\Controllers\School\EmploymentController as SchoolEmploymentController;
+use App\Http\Controllers\School\EmployeeInvitationController as SchoolEmployeeInvitationController;
+use App\Http\Controllers\School\EmployeeInterviewController as SchoolEmployeeInterviewController;
 use App\Http\Controllers\School\InterviewController as SchoolInterviewController;
 use App\Http\Controllers\SchoolProfileController;
 use App\Http\Controllers\Teacher\EmploymentController as TeacherEmploymentController;
@@ -72,19 +75,12 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('School/Dashboard');
         }
 
-        if ($user->isEmployee()) {
-            return Inertia::render('Employee/Dashboard');
-        }
-
-        if ($user->isTeacher()) {
-            return Inertia::render('Dashboard');
-        }
-
+        // All other roles (teacher, employee, etc.) use the same provider dashboard
         return Inertia::render('Dashboard');
     })->middleware('verified')->name('dashboard');
 
     // Teacher Profile
-    Route::get('/teacher-profile/create', [TeacherProfileController::class, 'create'])
+    Route::get('/complete-profile/create', [TeacherProfileController::class, 'create'])
         ->name('teacher-profile.create');
     Route::post('/teacher-profile/store', [TeacherProfileController::class, 'store'])
         ->name('teacher-profile.store');
@@ -133,6 +129,34 @@ Route::middleware('auth')->group(function () {
                 ->name('interviews.hire');
             Route::patch('/interviews/{interview}/reject', [SchoolInterviewController::class, 'reject'])
                 ->name('interviews.reject');
+
+            // Employee browsing & invitations
+            Route::get('/employees/browse', [SchoolEmployeeInvitationController::class, 'browse'])
+                ->name('employees.browse');
+            Route::post('/employee-invite', [SchoolEmployeeInvitationController::class, 'invite'])
+                ->name('employee-invite');
+            Route::get('/employee-invitations', [SchoolEmployeeInvitationController::class, 'invitations'])
+                ->name('employee-invitations');
+            Route::get('/employee-hired', [SchoolEmployeeInvitationController::class, 'hired'])
+                ->name('employee-hired');
+            Route::patch('/employee-invitations/{invitation}/hire', [SchoolEmployeeInvitationController::class, 'hire'])
+                ->name('employee-invitations.hire');
+            Route::patch('/employee-invitations/{invitation}/reject', [SchoolEmployeeInvitationController::class, 'reject'])
+                ->name('employee-invitations.reject');
+            Route::patch('/employee-invitations/{invitation}/end', [SchoolEmployeeInvitationController::class, 'endEmployment'])
+                ->name('employee-invitations.end');
+
+            // Employee Interviews
+            Route::get('/employee-invitations/{invitation}/interview', [SchoolEmployeeInterviewController::class, 'create'])
+                ->name('employee-interviews.create');
+            Route::post('/employee-invitations/{invitation}/interview', [SchoolEmployeeInterviewController::class, 'store'])
+                ->name('employee-interviews.store');
+            Route::get('/employee-interviews/{interview}', [SchoolEmployeeInterviewController::class, 'show'])
+                ->name('employee-interviews.show');
+            Route::patch('/employee-interviews/{interview}/hire', [SchoolEmployeeInterviewController::class, 'hire'])
+                ->name('employee-interviews.hire');
+            Route::patch('/employee-interviews/{interview}/reject', [SchoolEmployeeInterviewController::class, 'reject'])
+                ->name('employee-interviews.reject');
         });
 
     // Teacher Employment
@@ -488,12 +512,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/purchases', [AdminPurchaseController::class, 'indexAll'])
         ->name('purchases.all');
 
-    // Employee purchases
+    // Employee purchases & invitations
     Route::prefix('employee')->name('employee.')->group(function () {
         Route::get('/purchases', [EmployeePurchaseController::class, 'index'])
             ->name('purchases.index');
         Route::post('/purchases/{purchase}/complete', [EmployeePurchaseController::class, 'complete'])
             ->name('purchases.complete');
+
+        // Employee invitations
+        Route::get('/invitations', [EmployeeInvitationController::class, 'index'])
+            ->name('invitations.index');
+        Route::patch('/invitations/{invitation}/accept', [EmployeeInvitationController::class, 'accept'])
+            ->name('invitations.accept');
+        Route::patch('/invitations/{invitation}/decline', [EmployeeInvitationController::class, 'decline'])
+            ->name('invitations.decline');
     });
 });
 

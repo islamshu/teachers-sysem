@@ -17,7 +17,7 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = User::where('role', 'employee')
+        $employees = User::whereNotIn('role', ['teacher', 'school', 'admin'])
             ->with('branches', 'roles')
             ->latest()
             ->paginate(10);
@@ -36,7 +36,7 @@ class EmployeeController extends Controller
 
     public function tasksReport(Request $request, User $user)
     {
-        if ($user->role !== 'employee') {
+        if (in_array($user->role, ['teacher', 'school', 'admin'])) {
             return redirect()->back()->with('error', 'المستخدم ليس موظفاً');
         }
 
@@ -101,7 +101,7 @@ class EmployeeController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if ($user->role !== 'employee') {
+        if (in_array($user->role, ['teacher', 'school', 'admin'])) {
             return redirect()->back()->with('error', 'المستخدم ليس موظفاً');
         }
 
@@ -136,7 +136,7 @@ class EmployeeController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->role !== 'employee') {
+        if (in_array($user->role, ['teacher', 'school', 'admin'])) {
             return redirect()->back()->with('error', 'المستخدم ليس موظفاً');
         }
 

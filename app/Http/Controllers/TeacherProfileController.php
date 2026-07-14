@@ -21,10 +21,12 @@ class TeacherProfileController extends Controller
 
         $subjects = Subject::orderBy('name')->get();
         $grades = Grade::orderBy('name')->get();
+        $jobTitle = Auth::user()->job_title ?? Auth::user()->role;
 
         return Inertia::render('Teacher/ProfileForm', [
             'subjects' => $subjects,
             'grades' => $grades,
+            'jobTitle' => $jobTitle,
         ]);
     }
 
@@ -32,7 +34,7 @@ class TeacherProfileController extends Controller
     {
         $data = $request->validated();
 
-        $gradeIds = $data['grade_ids'];
+        $gradeIds = $data['grade_ids'] ?? [];
         unset($data['grade_ids']);
 
         if ($request->hasFile('photo')) {
@@ -40,14 +42,16 @@ class TeacherProfileController extends Controller
         }
 
         $data['user_id'] = Auth::id();
-
+        $data['status'] = 'approved'; // Set the status to 'approved' by default
         $profile = TeacherProfile::create($data);
 
-        $profile->grades()->sync($gradeIds);
+        if (!empty($gradeIds)) {
+            $profile->grades()->sync($gradeIds);
+        }
 
         return redirect()
             ->route('dashboard')
-            ->with('success', 'تم حفظ بيانات المدرس بنجاح');
+            ->with('success', 'تم حفظ بياناتك بنجاح');
     }
 
     public function edit()
@@ -60,11 +64,13 @@ class TeacherProfileController extends Controller
 
         $subjects = Subject::orderBy('name')->get();
         $grades = Grade::orderBy('name')->get();
+        $jobTitle = Auth::user()->job_title ?? Auth::user()->role;
 
         return Inertia::render('Teacher/ProfileForm', [
             'profile' => $profile->load(['grades', 'subject']),
             'subjects' => $subjects,
             'grades' => $grades,
+            'jobTitle' => $jobTitle,
         ]);
     }
 
@@ -78,7 +84,7 @@ class TeacherProfileController extends Controller
 
         $data = $request->validated();
 
-        $gradeIds = $data['grade_ids'];
+        $gradeIds = $data['grade_ids'] ?? [];
         unset($data['grade_ids']);
 
         if ($request->hasFile('photo')) {
@@ -91,10 +97,14 @@ class TeacherProfileController extends Controller
 
         $profile->update($data);
 
-        $profile->grades()->sync($gradeIds);
+        if (!empty($gradeIds)) {
+            $profile->grades()->sync($gradeIds);
+        } else {
+            $profile->grades()->detach();
+        }
 
         return redirect()
             ->route('dashboard')
-            ->with('success', 'تم تحديث بيانات المدرس بنجاح');
+            ->with('success', 'تم تحديث بياناتك بنجاح');
     }
 }

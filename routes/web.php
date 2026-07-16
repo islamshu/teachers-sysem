@@ -30,6 +30,7 @@ use App\Http\Controllers\Employee\PurchaseController as EmployeePurchaseControll
 use App\Http\Controllers\Employee\InvitationController as EmployeeInvitationController;
 use App\Http\Controllers\School\EmploymentController as SchoolEmploymentController;
 use App\Http\Controllers\School\EmployeeInvitationController as SchoolEmployeeInvitationController;
+use App\Http\Controllers\School\HiringController as SchoolHiringController;
 use App\Http\Controllers\School\EmployeeInterviewController as SchoolEmployeeInterviewController;
 use App\Http\Controllers\School\InterviewController as SchoolInterviewController;
 use App\Http\Controllers\SchoolProfileController;
@@ -157,6 +158,16 @@ Route::middleware('auth')->group(function () {
                 ->name('employee-interviews.hire');
             Route::patch('/employee-interviews/{interview}/reject', [SchoolEmployeeInterviewController::class, 'reject'])
                 ->name('employee-interviews.reject');
+
+            // Unified Hiring Routes
+            Route::get('/hiring/applicants', [SchoolHiringController::class, 'applicants'])
+                ->name('hiring.applicants');
+            Route::get('/hiring/employee/{user}', [SchoolHiringController::class, 'employeeShow'])
+                ->name('hiring.employee.show');
+            Route::get('/hiring/invitations', [SchoolHiringController::class, 'invitations'])
+                ->name('hiring.invitations');
+            Route::get('/hiring/hired', [SchoolHiringController::class, 'hired'])
+                ->name('hiring.hired');
         });
 
     // Teacher Employment

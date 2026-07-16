@@ -56,7 +56,6 @@
             <label for="job_title" class="block text-sm font-bold text-slate-700 mb-1.5">المسمى الوظيفي <span class="text-red-500">*</span></label>
             <select id="job_title" v-model="form.job_title" class="input-base" :class="{ 'input-error': form.errors.job_title }" required>
               <option value="">اختر المسمى الوظيفي</option>
-              <option value="teacher">معلم</option>
               <option v-for="role in roles" :key="role.name" :value="role.name">
                 {{ role.name }}
               </option>

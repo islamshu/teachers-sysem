@@ -29,9 +29,14 @@ class RolePermissionController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:' . config('permission.models.role') . ',name'],
             'permissions' => ['array'],
             'permissions.*' => ['exists:' . config('permission.models.permission') . ',name'],
+            'show_in_registration' => ['boolean'],
         ]);
 
-        $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
+        $role = Role::create([
+            'name' => $validated['name'],
+            'guard_name' => 'web',
+            'show_in_registration' => $validated['show_in_registration'] ?? false,
+        ]);
 
         if (!empty($validated['permissions'])) {
             $role->givePermissionTo($validated['permissions']);
@@ -52,9 +57,13 @@ class RolePermissionController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:' . config('permission.models.role') . ',name,' . $role->id],
             'permissions' => ['array'],
             'permissions.*' => ['exists:' . config('permission.models.permission') . ',name'],
+            'show_in_registration' => ['boolean'],
         ]);
 
-        $role->update(['name' => $validated['name']]);
+        $role->update([
+            'name' => $validated['name'],
+            'show_in_registration' => $validated['show_in_registration'] ?? false,
+        ]);
         $role->syncPermissions($validated['permissions'] ?? []);
 
         Cache::forget('spatie.permission.cache');
@@ -77,6 +86,13 @@ class RolePermissionController extends Controller
         Cache::forget('spatie.permission.cache');
 
         return redirect()->back()->with('success', 'تم حذف الدور بنجاح');
+    }
+
+    public function toggleRegistration(Role $role)
+    {
+        $role->update(['show_in_registration' => !$role->show_in_registration]);
+
+        return back()->with('success', $role->show_in_registration ? 'سيظهر في التسجيل' : 'لن يظهر في التسجيل');
     }
 
     public function permissions()

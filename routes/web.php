@@ -383,6 +383,8 @@ Route::middleware('auth')->group(function () {
                 ->name('roles.update');
             Route::delete('/roles/{role}', [RolePermissionController::class, 'destroyRole'])
                 ->name('roles.destroy');
+            Route::patch('/roles/{role}/toggle-registration', [RolePermissionController::class, 'toggleRegistration'])
+                ->name('roles.toggle-registration');
             Route::get('/permissions', [RolePermissionController::class, 'permissions'])
                 ->name('permissions.index');
             Route::post('/permissions', [RolePermissionController::class, 'storePermission'])

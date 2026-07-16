@@ -39,6 +39,7 @@
                 <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">الدور</th>
                 <th class="px-6 py-4 text-right text-sm font-bold text-slate-700">الصلاحيات</th>
                 <th class="px-6 py-4 text-center text-sm font-bold text-slate-700">عدد المستخدمين</th>
+                <th class="px-6 py-4 text-center text-sm font-bold text-slate-700">يظهر في التسجيل</th>
                 <th class="px-6 py-4 text-center text-sm font-bold text-slate-700">الإجراءات</th>
               </tr>
             </thead>
@@ -68,6 +69,21 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                   <span class="font-bold text-slate-700">{{ role.users_count }}</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <button
+                    type="button"
+                    @click="toggleRegistration(role)"
+                    :disabled="isProtected(role.name)"
+                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    :class="role.show_in_registration ? 'bg-primary-500' : 'bg-surface-300'"
+                    :title="role.show_in_registration ? 'يظهر في التسجيل' : 'مخفي عن التسجيل'"
+                  >
+                    <span
+                      class="absolute top-0.5 right-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-all duration-200"
+                      :class="role.show_in_registration ? 'translate-x-[-22px]' : ''"
+                    />
+                  </button>
                 </td>
                 <td class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center gap-2">
@@ -136,6 +152,23 @@
             <label class="block text-sm font-bold text-slate-700 mb-1.5">اسم الدور <span class="text-red-500">*</span></label>
             <input v-model="roleForm.name" type="text" class="input-base" placeholder="مشرف" required />
             <p v-if="roleForm.errors.name" class="mt-1 text-xs text-red-500 font-semibold">{{ roleForm.errors.name }}</p>
+          </div>
+
+          <div class="mb-5">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <button
+                type="button"
+                @click="roleForm.show_in_registration = !roleForm.show_in_registration"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none cursor-pointer"
+                :class="roleForm.show_in_registration ? 'bg-primary-500' : 'bg-surface-300'"
+              >
+                <span
+                  class="absolute top-0.5 right-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-all duration-200"
+                  :class="roleForm.show_in_registration ? 'translate-x-[-22px]' : ''"
+                />
+              </button>
+              <span class="text-sm font-bold text-slate-700">يظهر في نموذج التسجيل</span>
+            </label>
           </div>
 
           <div class="mb-6">
@@ -211,6 +244,7 @@ const editingRole = ref(null)
 const roleForm = useForm({
   name: '',
   permissions: [],
+  show_in_registration: false,
 })
 
 const groupedPermissions = computed(() => {
@@ -279,6 +313,7 @@ const editRole = (role) => {
   editingRole.value = role
   roleForm.name = role.name
   roleForm.permissions = role.permissions.map(p => p.name)
+  roleForm.show_in_registration = role.show_in_registration || false
   roleForm.errors = {}
   showEditModal.value = true
 }
@@ -299,6 +334,13 @@ const submitRole = () => {
       },
     })
   }
+}
+
+const toggleRegistration = (role) => {
+  useForm({}).patch(`/admin/roles/${role.id}/toggle-registration`, {
+    preserveScroll: true,
+    onSuccess: () => location.reload(),
+  })
 }
 
 const deleteRole = (role) => {

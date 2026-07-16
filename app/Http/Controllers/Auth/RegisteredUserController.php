@@ -17,8 +17,7 @@ class RegisteredUserController extends Controller
 {
     public function create()
     {
-        $roles = Role::where('name', '!=', 'admin')->orderBy('name')->get(['name']);
-
+        $roles = Role::where('show_in_registration', true)->orderBy('name')->get(['name']);
         return Inertia::render('Auth/Register', [
             'roles' => $roles,
         ]);
@@ -26,7 +25,7 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $roleNames = Role::pluck('name')->toArray();
+        $roleNames = Role::where('show_in_registration', true)->pluck('name')->toArray();
         $validRoles = array_merge(['teacher'], $roleNames);
 
         $request->validate([

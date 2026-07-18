@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
-
+use Illuminate\Support\Str;
 class RegisteredUserController extends Controller
 {
     public function create()
@@ -42,6 +42,7 @@ class RegisteredUserController extends Controller
             'role' => $request->job_title === 'teacher' ? 'teacher' : $request->job_title,
             'job_title' => $request->job_title,
         ]);
+        $user->update([ 'telegram_link_token' => Str::random(40) ]);
 
         event(new Registered($user));
 

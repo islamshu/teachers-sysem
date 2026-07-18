@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GeneralTask;
 use App\Models\GeneralTaskLog;
 use App\Models\User;
+use App\Notifications\GeneralTaskAssigned;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,7 +28,7 @@ class GeneralTaskController extends Controller
         return Inertia::render('Admin/GeneralTasks/Index', [
             'tasks' => $tasks->items(),
             'nextPage' => $tasks->currentPage() < $tasks->lastPage() ? $tasks->currentPage() + 1 : null,
-            'employees' => User::where('role', 'employee')->select('id', 'name', 'email')->get(),
+            'employees' => User::where('role', 'employee')->where('is_hired', true)->select('id', 'name', 'email')->get(),
             'roles' => Role::all(),
         ]);
     }
@@ -137,6 +138,8 @@ class GeneralTaskController extends Controller
             $task->roles()->attach($validated['role_ids']);
         }
 
+        $this->notifyAssignedUsers($task, 'created');
+
         TaskUpdated::dispatch('general', 'created', ['task_id' => $task->id]);
 
         return redirect()->back()->with('success', 'تم إنشاء المهمة العامة بنجاح');
@@ -171,6 +174,8 @@ class GeneralTaskController extends Controller
         $generalTask->assignedUsers()->sync($validated['user_ids'] ?? []);
         $generalTask->roles()->sync($validated['role_ids'] ?? []);
 
+        $this->notifyAssignedUsers($generalTask, 'updated');
+
         TaskUpdated::dispatch('general', 'updated', ['task_id' => $generalTask->id]);
 
         return redirect()->back()->with('success', 'تم تحديث المهمة العامة بنجاح');
@@ -178,10 +183,26 @@ class GeneralTaskController extends Controller
 
     public function destroy(GeneralTask $generalTask)
     {
+        $this->notifyAssignedUsers($generalTask, 'deleted');
+
         $generalTask->delete();
 
         TaskUpdated::dispatch('general', 'deleted', ['task_id' => $generalTask->id]);
 
         return redirect()->back()->with('success', 'تم حذف المهمة العامة بنجاح');
+    }
+
+    private function notifyAssignedUsers(GeneralTask $task, string $action): void
+    {
+        $roleUserIds = User::whereHas('roles', fn ($q) => $q->whereIn('roles.id', $task->roles->pluck('id')))
+            ->pluck('id');
+
+        $directUserIds = $task->assignedUsers->pluck('id');
+
+        $allUserIds = $roleUserIds->merge($directUserIds)->unique();
+
+        User::whereIn('id', $allUserIds)->each(function ($user) use ($task, $action) {
+            $user->notify(new GeneralTaskAssigned($task, $action));
+        });
     }
 }

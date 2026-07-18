@@ -35,7 +35,7 @@ class PurchaseApproved extends Notification
     public function toTelegram(object $notifiable): array
     {
         return [
-            'text' => "✅ <b>تمت الموافقة على طلب الشراء</b>\n\nرقم الطلب: #{$this->purchase->id}\nالمنتج: {$this->purchase->item_name}\n\nتم خصم المبلغ من رصيدك.\n\n<a href=\"" . route('employee.purchases.index') . "\">عرض الطلبات</a>",
+            'text' => "✅ <b>تمت الموافقة على الفاتورة</b>\n\nرقم الطلب: #{$this->purchase->id}\nالمنتج: {$this->purchase->item_name}\n\nتم خصم المبلغ من رصيدك.\n\n<a href=\"" . route('employee.purchases.index') . "\">عرض الطلبات</a>",
         ];
     }
 }

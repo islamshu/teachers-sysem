@@ -116,9 +116,14 @@
             <div class="flex items-center gap-2">
               <span
                 class="inline-flex px-2.5 py-0.5 rounded-lg text-xs font-bold"
-                :class="purchase.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                :class="{
+                  'bg-amber-100 text-amber-700': purchase.status === 'pending',
+                  'bg-blue-100 text-blue-700': purchase.status === 'completed',
+                  'bg-emerald-100 text-emerald-700': purchase.status === 'approved',
+                  'bg-red-100 text-red-700': purchase.status === 'rejected',
+                }"
               >
-                {{ purchase.status === 'completed' ? 'مكتمل' : 'قيد الانتظار' }}
+                {{ { pending: 'قيد الانتظار', completed: 'بانتظار المراجعة', approved: 'تمت الموافقة', rejected: 'مرفوض' }[purchase.status] }}
               </span>
               <button
                 v-if="purchase.status === 'pending' && isAssigned(purchase)"
@@ -170,10 +175,83 @@
           </div>
 
           <div v-if="purchase.status === 'completed'" class="mt-4 pt-4 border-t border-surface-200">
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xs font-bold text-blue-700">بانتظار مراجعة الإدارة</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="py-2 px-3 bg-blue-50 rounded-xl">
+                <p class="text-xs text-slate-500 mb-1">المبلغ الفعلي</p>
+                <p class="text-sm font-bold text-blue-700">{{ purchase.actual_amount }} ريال</p>
+              </div>
+              <div class="py-2 px-3 bg-surface-50 rounded-xl">
+                <p class="text-xs text-slate-500 mb-1">المبلغ المتبقي</p>
+                <p class="text-sm font-bold" :class="purchase.remaining_amount > 0 ? 'text-amber-600' : 'text-emerald-600'">
+                  {{ purchase.remaining_amount }} ريال
+                </p>
+              </div>
+              <div v-if="purchase.invoice_image" class="py-2 px-3 bg-surface-50 rounded-xl flex items-center">
+                <a :href="`/storage/${purchase.invoice_image}`" target="_blank" class="text-sm font-bold text-primary-600 hover:text-primary-800 flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  عرض الفاتورة
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="purchase.status === 'approved'" class="mt-4 pt-4 border-t border-surface-200">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <p class="text-xs font-bold text-emerald-700">تمت الموافقة وخصم المبلغ من رصيدك</p>
+              </div>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="py-2 px-3 bg-emerald-50 rounded-xl">
                 <p class="text-xs text-slate-500 mb-1">المبلغ الفعلي</p>
                 <p class="text-sm font-bold text-emerald-700">{{ purchase.actual_amount }} ريال</p>
+              </div>
+              <div class="py-2 px-3 bg-surface-50 rounded-xl">
+                <p class="text-xs text-slate-500 mb-1">المبلغ المتبقي</p>
+                <p class="text-sm font-bold" :class="purchase.remaining_amount > 0 ? 'text-amber-600' : 'text-emerald-600'">
+                  {{ purchase.remaining_amount }} ريال
+                </p>
+              </div>
+              <div v-if="purchase.invoice_image" class="py-2 px-3 bg-surface-50 rounded-xl flex items-center">
+                <a :href="`/storage/${purchase.invoice_image}`" target="_blank" class="text-sm font-bold text-primary-600 hover:text-primary-800 flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  عرض الفاتورة
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="purchase.status === 'rejected'" class="mt-4 pt-4 border-t border-surface-200">
+            <div class="bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
+              <div class="flex items-center gap-2 mb-2">
+                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <p class="text-xs font-bold text-red-700">تم رفض الطلب من الإدارة</p>
+              </div>
+              <div v-if="purchase.rejection_reason" class="bg-white rounded-xl p-2 border border-red-100">
+                <p class="text-xs text-slate-500">سبب الرفض: <span class="font-bold text-red-700">{{ purchase.rejection_reason }}</span></p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="py-2 px-3 bg-surface-50 rounded-xl">
+                <p class="text-xs text-slate-500 mb-1">المبلغ الفعلي</p>
+                <p class="text-sm font-bold text-slate-700">{{ purchase.actual_amount }} ريال</p>
               </div>
               <div class="py-2 px-3 bg-surface-50 rounded-xl">
                 <p class="text-xs text-slate-500 mb-1">المبلغ المتبقي</p>

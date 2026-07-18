@@ -17,7 +17,7 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = User::whereNotIn('role', ['teacher', 'school', 'admin'])
+        $employees = User::where('is_hired', true)
             ->with('branches', 'roles')
             ->latest()
             ->paginate(10);
@@ -89,6 +89,7 @@ class EmployeeController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'employee',
+            'is_hired' => true,
         ]);
 
         $user->branches()->attach($validated['branch_ids']);

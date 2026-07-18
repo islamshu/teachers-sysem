@@ -41,9 +41,9 @@
               <span class="text-sm text-slate-500">الحالة</span>
               <span
                 class="inline-flex px-2.5 py-0.5 rounded-lg text-xs font-bold"
-                :class="purchase.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                :class="statusClass"
               >
-                {{ purchase.status === 'completed' ? 'مكتمل' : 'قيد الانتظار' }}
+                {{ statusText }}
               </span>
             </div>
             <div class="flex items-center justify-between py-3 px-4 bg-surface-50 rounded-xl">
@@ -72,12 +72,17 @@
             <div
               v-for="emp in purchase.employees"
               :key="emp.id"
-              class="flex items-center gap-3 py-3 px-4 bg-surface-50 rounded-xl"
+              class="flex items-center justify-between py-3 px-4 bg-surface-50 rounded-xl"
             >
-              <div class="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
-                {{ emp.name?.charAt(0) }}
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
+                  {{ emp.name?.charAt(0) }}
+                </div>
+                <span class="text-sm font-bold text-slate-900">{{ emp.name }}</span>
               </div>
-              <span class="text-sm font-bold text-slate-900">{{ emp.name }}</span>
+              <span v-if="employeeBalance !== null" class="text-xs font-bold text-slate-500">
+                الرصيد: {{ employeeBalance }} ريال
+              </span>
             </div>
             <p v-if="!purchase.employees?.length" class="text-sm text-slate-400 text-center py-4">لا يوجد موظفون</p>
           </div>
@@ -89,8 +94,8 @@
         <p class="text-sm text-slate-700 whitespace-pre-wrap">{{ purchase.notes }}</p>
       </div>
 
-      <div v-if="purchase.status === 'completed'" class="card p-6 animate-fade-in-up animate-delay-200">
-        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">نتيجة الشراء</h3>
+      <div v-if="purchase.status === 'completed'" class="card p-6 mb-6 animate-fade-in-up animate-delay-200">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">نتيجة الشراء من الموظف</h3>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="py-3 px-4 bg-surface-50 rounded-xl">
             <p class="text-xs text-slate-500 mb-1">المبلغ الفعلي</p>
@@ -121,18 +126,181 @@
             <span class="text-sm font-bold text-primary-700">عرض الفاتورة</span>
           </a>
         </div>
+
+        <div class="flex items-center gap-3 mt-6 pt-4 border-t border-surface-200">
+          <button
+            @click="approvePurchase"
+            :disabled="processing"
+            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-colors disabled:opacity-50"
+          >
+            <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            الموافقة وخصم المبلغ
+          </button>
+          <button
+            @click="showRejectModal = true"
+            :disabled="processing"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-colors disabled:opacity-50"
+          >
+            <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            رفض الطلب
+          </button>
+        </div>
+      </div>
+
+      <div v-if="purchase.status === 'approved'" class="card p-6 mb-6 animate-fade-in-up animate-delay-200 border-2 border-emerald-200">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-emerald-700">تمت الموافقة على الطلب</h3>
+            <p class="text-xs text-slate-500">{{ formatDate(purchase.approved_at) }} - بواسطة {{ purchase.approver?.name }}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="py-3 px-4 bg-emerald-50 rounded-xl">
+            <p class="text-xs text-slate-500 mb-1">المبلغ الفعلي</p>
+            <p class="text-lg font-bold text-emerald-700">{{ purchase.actual_amount }} ريال</p>
+          </div>
+          <div class="py-3 px-4 bg-emerald-50 rounded-xl">
+            <p class="text-xs text-slate-500 mb-1">المبلغ المتبقي</p>
+            <p class="text-lg font-bold" :class="purchase.remaining_amount > 0 ? 'text-amber-600' : 'text-emerald-600'">
+              {{ purchase.remaining_amount }} ريال
+            </p>
+          </div>
+          <div class="py-3 px-4 bg-emerald-50 rounded-xl">
+            <p class="text-xs text-slate-500 mb-1">تاريخ الإكمال</p>
+            <p class="text-sm font-bold text-slate-900">{{ formatDate(purchase.completed_at) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="purchase.status === 'rejected'" class="card p-6 mb-6 animate-fade-in-up animate-delay-200 border-2 border-red-200">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-red-700">تم رفض الطلب</h3>
+          </div>
+        </div>
+        <div class="py-3 px-4 bg-red-50 rounded-xl">
+          <p class="text-xs text-slate-500 mb-1">سبب الرفض</p>
+          <p class="text-sm font-bold text-red-700">{{ purchase.rejection_reason }}</p>
+        </div>
+      </div>
+
+      <div v-if="purchase.status === 'pending'" class="card p-6 animate-fade-in-up animate-delay-200">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">نتيجة الشراء</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="py-3 px-4 bg-surface-50 rounded-xl">
+            <p class="text-xs text-slate-500 mb-1">المبلغ الفعلي</p>
+            <p class="text-lg font-bold text-slate-900">{{ purchase.actual_amount }} ريال</p>
+          </div>
+          <div class="py-3 px-4 bg-surface-50 rounded-xl">
+            <p class="text-xs text-slate-500 mb-1">المبلغ المتبقي</p>
+            <p class="text-lg font-bold" :class="purchase.remaining_amount > 0 ? 'text-amber-600' : 'text-emerald-600'">
+              {{ purchase.remaining_amount }} ريال
+            </p>
+          </div>
+          <div class="py-3 px-4 bg-surface-50 rounded-xl">
+            <p class="text-xs text-slate-500 mb-1">تاريخ الإكمال</p>
+            <p class="text-sm font-bold text-slate-900">{{ formatDate(purchase.completed_at) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reject Modal -->
+      <div v-if="showRejectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" @click.self="showRejectModal = false">
+        <div class="bg-white rounded-3xl w-full max-w-lg mx-4 p-8 shadow-2xl animate-fade-in-up">
+          <h3 class="text-xl font-extrabold text-slate-900 mb-6">رفض طلب الشراء</h3>
+          <form @submit.prevent="submitReject">
+            <div class="mb-5">
+              <label class="block text-sm font-bold text-slate-700 mb-1.5">سبب الرفض <span class="text-red-500">*</span></label>
+              <textarea
+                v-model="rejectForm.rejection_reason"
+                rows="4"
+                class="input-base"
+                placeholder="اكتب سبب رفض الطلب..."
+              ></textarea>
+              <p v-if="rejectForm.errors.rejection_reason" class="mt-1 text-xs text-red-500 font-semibold">{{ rejectForm.errors.rejection_reason }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="submit" :disabled="rejectForm.processing" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-colors disabled:opacity-50 flex-1">
+                {{ rejectForm.processing ? 'جاري الرفض...' : 'تأكيد الرفض' }}
+              </button>
+              <button type="button" @click="showRejectModal = false" class="btn-ghost flex-1">إلغاء</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </DashboardLayout>
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 
 const props = defineProps({
   purchase: Object,
+  employeeBalance: Number,
 })
+
+const showRejectModal = ref(false)
+const processing = ref(false)
+
+const rejectForm = useForm({
+  rejection_reason: '',
+})
+
+const statusText = computed(() => {
+  const map = {
+    pending: 'قيد الانتظار',
+    completed: 'بانتظار المراجعة',
+    approved: 'تمت الموافقة',
+    rejected: 'مرفوض',
+  }
+  return map[props.purchase.status] || props.purchase.status
+})
+
+const statusClass = computed(() => {
+  const map = {
+    pending: 'bg-amber-100 text-amber-700',
+    completed: 'bg-blue-100 text-blue-700',
+    approved: 'bg-emerald-100 text-emerald-700',
+    rejected: 'bg-red-100 text-red-700',
+  }
+  return map[props.purchase.status] || 'bg-surface-100 text-slate-500'
+})
+
+function approvePurchase() {
+  if (!confirm('هل أنت متأكد من الموافقة على هذا الطلب؟ سيتم خصم المبلغ من رصيد الموظف.')) return
+  processing.value = true
+  router.post(`/admin/purchases/${props.purchase.id}/approve`, {}, {
+    onFinish: () => { processing.value = false },
+  })
+}
+
+function submitReject() {
+  processing.value = true
+  rejectForm.post(`/admin/purchases/${props.purchase.id}/reject`, {
+    onSuccess: () => {
+      showRejectModal.value = false
+      rejectForm.reset()
+    },
+    onFinish: () => { processing.value = false },
+  })
+}
 
 function formatDate(date) {
   if (!date) return '-'

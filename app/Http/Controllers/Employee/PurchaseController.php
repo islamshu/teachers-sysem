@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Employee;
 use App\Events\PurchaseUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
+use App\Models\User;
 use App\Notifications\PurchaseCompleted;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PurchaseController extends Controller
 {
     public function index()
     {
-        $purchases = Purchase::with('creator')
+        $purchases = Purchase::with('creator', 'approver')
             ->whereHas('employees', fn($q) => $q->where('user_id', auth()->id()))
             ->latest()
             ->get();
@@ -33,8 +33,8 @@ class PurchaseController extends Controller
             abort(403);
         }
 
-        if ($purchase->status === 'completed') {
-            return redirect()->back()->with('error', 'تم إكمال هذا الطلب مسبقاً');
+        if ($purchase->status !== Purchase::STATUS_PENDING) {
+            return redirect()->back()->with('error', 'لا يمكن إتمام هذا الطلب');
         }
 
         $rules = [
@@ -42,9 +42,9 @@ class PurchaseController extends Controller
         ];
 
         if ($purchase->requires_invoice) {
-            $rules['invoice_image'] = 'required|image|mimes:jpg,jpeg,png|max:2048';
+            $rules['invoice_image'] = 'required|image|mimes:jpg,jpeg,png';
         } else {
-            $rules['invoice_image'] = 'nullable|image|mimes:jpg,jpeg,png|max:2048';
+            $rules['invoice_image'] = 'nullable|image|mimes:jpg,jpeg,png';
         }
 
         $validated = $request->validate($rules);
@@ -52,7 +52,7 @@ class PurchaseController extends Controller
         $data = [
             'actual_amount' => $validated['actual_amount'],
             'remaining_amount' => $purchase->amount - $validated['actual_amount'],
-            'status' => 'completed',
+            'status' => Purchase::STATUS_COMPLETED,
             'completed_at' => now(),
         ];
 
@@ -62,10 +62,13 @@ class PurchaseController extends Controller
 
         $purchase->update($data);
 
-        $purchase->creator->notify(new PurchaseCompleted($purchase));
+        $admin = User::where('role', 'admin')->first();
+        if ($admin) {
+            $admin->notify(new PurchaseCompleted($purchase));
+        }
 
         PurchaseUpdated::dispatch('completed', $purchase);
 
-        return redirect()->back()->with('success', 'تم إكمال طلب الشراء بنجاح');
+        return redirect()->back()->with('success', 'تم إرسال طلب الشراء للمراجعة');
     }
 }

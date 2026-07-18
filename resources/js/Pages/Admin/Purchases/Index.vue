@@ -77,9 +77,14 @@
                 <td class="px-4 py-3 text-center">
                   <span
                     class="inline-flex px-2.5 py-0.5 rounded-lg text-xs font-bold"
-                    :class="purchase.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                    :class="{
+                      'bg-amber-100 text-amber-700': purchase.status === 'pending',
+                      'bg-blue-100 text-blue-700': purchase.status === 'completed',
+                      'bg-emerald-100 text-emerald-700': purchase.status === 'approved',
+                      'bg-red-100 text-red-700': purchase.status === 'rejected',
+                    }"
                   >
-                    {{ purchase.status === 'completed' ? 'مكتمل' : 'قيد الانتظار' }}
+                    {{ { pending: 'قيد الانتظار', completed: 'بانتظار المراجعة', approved: 'تمت الموافقة', rejected: 'مرفوض' }[purchase.status] }}
                   </span>
                 </td>
                 <td class="px-4 py-3 text-center">

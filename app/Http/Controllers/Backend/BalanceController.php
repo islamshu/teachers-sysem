@@ -25,6 +25,7 @@ class BalanceController extends Controller
     public function create()
     {
         $users = User::select('id', 'name', 'email', 'role')
+            ->where('is_hired', true)
             ->get();
 
         return Inertia::render('Admin/Balances/Create', [
@@ -71,5 +72,21 @@ class BalanceController extends Controller
 
         return redirect()->route('admin.balances.index')
             ->with('success', 'تم إضافة الرصيد بنجاح');
+    }
+
+    public function show(User $user)
+    {
+        $balance = UserBalance::where('user_id', $user->id)->first();
+
+        $transactions = BalanceTransaction::where('user_id', $user->id)
+            ->with('addedBy')
+            ->latest()
+            ->get();
+
+        return Inertia::render('Admin/Balances/Show', [
+            'user' => $user,
+            'balance' => $balance,
+            'transactions' => $transactions,
+        ]);
     }
 }

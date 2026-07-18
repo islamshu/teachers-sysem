@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Route;
 // Public routes - الصفحة الرئيسية تعرض المدرسين المقبولين
 Route::get('/', [FrontendTeacherController::class, 'index'])
     ->name('home');
-
+Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);
 // تحويل /teachers إلى الصفحة الرئيسية
 Route::get('/teachers', function () {
     return redirect('/');
@@ -490,6 +490,8 @@ Route::middleware('auth')->group(function () {
                 ->name('store');
             Route::get('/user/{user}', [BalanceController::class, 'getUserBalance'])
                 ->name('user-balance');
+            Route::get('/{user}', [BalanceController::class, 'show'])
+                ->name('show');
         });
 
         // Purchases management (requires permission)
@@ -502,6 +504,10 @@ Route::middleware('auth')->group(function () {
                 ->name('purchases.store');
             Route::get('/purchases/{purchase}', [AdminPurchaseController::class, 'show'])
                 ->name('purchases.show');
+            Route::post('/purchases/{purchase}/approve', [AdminPurchaseController::class, 'approve'])
+                ->name('purchases.approve');
+            Route::post('/purchases/{purchase}/reject', [AdminPurchaseController::class, 'reject'])
+                ->name('purchases.reject');
         });
     });
 

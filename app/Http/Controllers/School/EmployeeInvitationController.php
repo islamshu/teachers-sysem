@@ -109,6 +109,7 @@ class EmployeeInvitationController extends Controller
         ]);
 
         $employee = $invitation->employee;
+        $employee->update(['is_hired' => true]);
         $roleName = $employee->role;
         if ($roleName && !in_array($roleName, ['teacher', 'school', 'admin'])) {
             $spatieRole = Role::where('name', $roleName)->first();

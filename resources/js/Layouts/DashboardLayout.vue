@@ -804,6 +804,45 @@
         <slot />
       </main>
     </div>
+
+    <!-- Floating Telegram Widget -->
+    <div
+      v-if="!$page.props.auth.user?.telegram_chat_id"
+      class="fixed z-[9999] transition-all duration-500 ease-out"
+      :class="widgetVisible ? 'left-0 opacity-100 translate-x-0' : '-left-80 opacity-0 -translate-x-full'"
+      :style="widgetStyle"
+    >
+      <div class="w-72 bg-white rounded-2xl shadow-2xl shadow-blue-500/10 border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-3 flex items-center gap-2">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+          <span class="text-white font-bold text-sm">Telegram</span>
+          <button @click="dismissWidget" class="mr-auto text-white/70 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="p-5">
+          <p class="font-bold text-slate-800 text-sm mb-1">اربط حسابك الآن</p>
+          <p class="text-xs text-slate-500 mb-4 leading-relaxed">احصل على الإشعارات المهمة مباشرة على Telegram</p>
+          <button
+            @click="openTelegramLink"
+            :disabled="widgetConnecting"
+            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-sm py-2.5 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-50"
+          >
+            <span v-if="widgetConnecting" class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              جاري الربط...
+            </span>
+            <span v-else>ربط الآن</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -859,4 +898,68 @@ const toggleSubmenu = (name) => {
 
 const form = useForm({})
 const logout = () => form.post('/logout')
+
+const widgetVisible = ref(false)
+const widgetConnecting = ref(false)
+const widgetDismissed = ref(false)
+
+const widgetStyle = computed(() => {
+  return 'top: 50%; transform: translateY(-50%);'
+})
+
+onMounted(() => {
+  setTimeout(() => {
+    if (!widgetDismissed.value) {
+      widgetVisible.value = true
+    }
+  }, 1000)
+})
+
+const dismissWidget = () => {
+  widgetVisible.value = false
+  widgetDismissed.value = true
+}
+
+const openTelegramLink = async () => {
+  widgetConnecting.value = true
+  try {
+    const response = await fetch('/telegram/connect')
+    const data = await response.json()
+    if (data.link) {
+      window.open(data.link, '_blank')
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    widgetConnecting.value = false
+  }
+}
 </script>
+
+<style scoped>
+@media (max-width: 768px) {
+  .fixed.z-\[9999\] {
+    top: auto !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    transform: none !important;
+  }
+
+  .fixed.z-\[9999\] .w-72 {
+    width: 100% !important;
+  }
+
+  .fixed.z-\[9999\].-left-80 {
+    left: 20px !important;
+    bottom: -100px !important;
+    transform: none !important;
+  }
+
+  .fixed.z-\[9999\].left-0 {
+    left: 20px !important;
+    bottom: 20px !important;
+    transform: none !important;
+  }
+}
+</style>

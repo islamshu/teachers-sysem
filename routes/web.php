@@ -203,6 +203,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Telegram
+    Route::get('/telegram/connect', [\App\Http\Controllers\TelegramController::class, 'telegramConnect'])
+        ->name('telegram.connect');
+
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         // محتوى إضافي - لا يوجد صلاحية محددة (دور admin فقط)

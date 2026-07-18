@@ -26,11 +26,11 @@ class InvitationController extends Controller
 
     public function accept(EmployeeInvitation $invitation)
     {
-        if ($invitation->employee_id !== Auth::id()) {
+        if ($invitation->employee_id != Auth::id()) {
             abort(403);
         }
 
-        if ($invitation->status !== 'invited') {
+        if ($invitation->status != 'invited') {
             return back()->withErrors(['invitation' => 'لا يمكن قبول هذه الدعوة']);
         }
 
@@ -45,11 +45,11 @@ class InvitationController extends Controller
 
     public function decline(EmployeeInvitation $invitation)
     {
-        if ($invitation->employee_id !== Auth::id()) {
+        if ($invitation->employee_id != Auth::id()) {
             abort(403);
         }
 
-        if ($invitation->status !== 'invited') {
+        if ($invitation->status != 'invited') {
             return back()->withErrors(['invitation' => 'لا يمكن رفض هذه الدعوة']);
         }
 

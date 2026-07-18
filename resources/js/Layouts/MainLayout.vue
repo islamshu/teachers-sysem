@@ -198,7 +198,7 @@
                   </button>
                   <div v-if="mobileTeachersOpen" class="mr-8 space-y-1 border-r-2 border-primary-200 pr-3">
                     <Link href="/admin/teachers" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"
-                      :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/TeachersIndex' && $page.props.currentStatus !== 'approved' && $page.props.currentStatus !== 'rejected' }">
+                      :class="{ 'text-primary-700 bg-primary-50': $page.component === 'Admin/TeachersIndex' && $page.props.currentStatus != 'approved' && $page.props.currentStatus != 'rejected' }">
                       قيد المراجعة
                     </Link>
                     <Link href="/admin/teachers?status=approved" @click="showMobileMenu = false" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200"

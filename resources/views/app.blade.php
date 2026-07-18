@@ -43,7 +43,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="theme-color" content="{{ $primaryColor }}" />
         <style>:root{ {{ $vars }} }</style>
-        <script>if(top!==self){top.location=self.location}</script>
+        <script>if(top!=self){top.location=self.location}</script>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

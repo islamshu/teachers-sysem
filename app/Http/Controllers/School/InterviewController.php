@@ -17,7 +17,7 @@ class InterviewController extends Controller
 {
     public function create(Employment $employment)
     {
-        if ($employment->status !== 'accepted') {
+        if ($employment->status != 'accepted') {
             return back()->withErrors(['employment' => 'يجب أن يقبل المدرس الدعوة أولاً']);
         }
 
@@ -38,7 +38,7 @@ class InterviewController extends Controller
 
     public function store(Request $request, Employment $employment)
     {
-        if ($employment->status !== 'accepted') {
+        if ($employment->status != 'accepted') {
             return back()->withErrors(['employment' => 'يجب أن يقبل المدرس الدعوة أولاً']);
         }
 
@@ -102,7 +102,7 @@ class InterviewController extends Controller
     {
         $employment = $interview->employment;
 
-        if ($employment->status !== 'interviewed') {
+        if ($employment->status != 'interviewed') {
             return back()->withErrors(['employment' => 'لا يمكن توظيف هذا المدرس حالياً']);
         }
 
@@ -123,7 +123,7 @@ class InterviewController extends Controller
     {
         $employment = $interview->employment;
 
-        if ($employment->status !== 'interviewed') {
+        if ($employment->status != 'interviewed') {
             return back()->withErrors(['employment' => 'لا يمكن رفض هذا المدرس حالياً']);
         }
 

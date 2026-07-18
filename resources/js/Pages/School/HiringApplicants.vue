@@ -451,7 +451,7 @@ const sendTeacherInvite = () => {
     preserveScroll: true,
     onSuccess: () => {
       showInviteModal.value = false
-      itemsList.value = itemsList.value.filter(t => t.id !== selectedTeacher.value?.id)
+      itemsList.value = itemsList.value.filter(t => t.id != selectedTeacher.value?.id)
       selectedTeacher.value = null
     },
   })
@@ -473,7 +473,7 @@ const sendEmployeeInvite = () => {
     preserveScroll: true,
     onSuccess: () => {
       showEmployeeInviteModal.value = false
-      itemsList.value = itemsList.value.filter(e => e.id !== selectedEmployee.value?.id)
+      itemsList.value = itemsList.value.filter(e => e.id != selectedEmployee.value?.id)
       selectedEmployee.value = null
     },
   })

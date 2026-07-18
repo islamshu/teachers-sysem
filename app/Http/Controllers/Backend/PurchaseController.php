@@ -113,7 +113,7 @@ class PurchaseController extends Controller
 
     public function approve(Request $request, Purchase $purchase)
     {
-        if ($purchase->status !== Purchase::STATUS_COMPLETED) {
+        if ($purchase->status != Purchase::STATUS_COMPLETED) {
             return redirect()->back()->with('error', 'لا يمكن الموافقة على هذا الطلب');
         }
 
@@ -164,7 +164,7 @@ class PurchaseController extends Controller
 
     public function reject(Request $request, Purchase $purchase)
     {
-        if ($purchase->status !== Purchase::STATUS_COMPLETED) {
+        if ($purchase->status != Purchase::STATUS_COMPLETED) {
             return redirect()->back()->with('error', 'لا يمكن رفض هذا الطلب');
         }
 

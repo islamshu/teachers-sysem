@@ -34,7 +34,7 @@
             <label class="block text-sm font-bold text-slate-700 mb-4">الأدوار المتاحة</label>
             <div class="space-y-3">
               <label
-                v-for="role in roles.filter(r => r.name !== 'teacher')"
+                v-for="role in roles.filter(r => r.name != 'teacher')"
                 :key="role.id"
                 class="flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer"
                 :class="selectedRoles.includes(role.name) ? 'border-primary-500 bg-primary-50' : 'border-surface-200 hover:border-primary-200'"

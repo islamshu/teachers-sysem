@@ -149,7 +149,7 @@ class EmployeeInvitationController extends Controller
 
     public function endEmployment(EmployeeInvitation $invitation)
     {
-        if ($invitation->status !== 'hired') {
+        if ($invitation->status != 'hired') {
             return back()->withErrors(['invitation' => 'لا يمكن إنهاء توظيف غير نشط']);
         }
 

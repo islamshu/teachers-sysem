@@ -80,7 +80,7 @@
                 </div>
                 <span class="text-sm font-bold text-slate-900">{{ emp.name }}</span>
               </div>
-              <span v-if="employeeBalance !== null" class="text-xs font-bold text-slate-500">
+              <span v-if="employeeBalance != null" class="text-xs font-bold text-slate-500">
                 الرصيد: {{ employeeBalance }} ريال
               </span>
             </div>

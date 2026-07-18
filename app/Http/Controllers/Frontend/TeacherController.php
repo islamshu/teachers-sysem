@@ -17,7 +17,7 @@ class TeacherController extends Controller
         if ($request->wantsJson()) {
             $query = TeacherProfile::with(['user', 'subject', 'grades'])
                 ->where('status', 'approved')
-                ->when($request->job_title && $request->job_title !== 'all', function ($q) use ($request) {
+                ->when($request->job_title && $request->job_title != 'all', function ($q) use ($request) {
                     $q->whereHas('user', function ($q2) use ($request) {
                         $q2->where('job_title', $request->job_title);
                     });
@@ -68,7 +68,7 @@ class TeacherController extends Controller
 
     public function show(TeacherProfile $teacher)
     {
-        if ($teacher->status !== 'approved') {
+        if ($teacher->status != 'approved') {
             abort(404);
         }
 

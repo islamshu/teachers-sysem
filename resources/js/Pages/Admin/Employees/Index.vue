@@ -57,7 +57,7 @@
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1.5">
                     <span
-                      v-for="role in employee.roles.filter(r => r.name !== 'teacher')"
+                      v-for="role in employee.roles.filter(r => r.name != 'teacher')"
                       :key="role.id"
                       class="inline-flex px-2.5 py-0.5 rounded-lg bg-primary-100 text-primary-700 text-xs font-semibold"
                     >
@@ -240,7 +240,7 @@
               <label class="block text-sm font-semibold text-slate-700 mb-2">الأدوار <span class="text-red-500">*</span></label>
               <div class="space-y-2 max-h-40 overflow-y-auto p-3 bg-surface-50 rounded-xl">
                 <label
-                  v-for="role in roles.filter(r => r.name !== 'teacher')"
+                  v-for="role in roles.filter(r => r.name != 'teacher')"
                   :key="role.id"
                   class="flex items-center gap-3 cursor-pointer group"
                 >

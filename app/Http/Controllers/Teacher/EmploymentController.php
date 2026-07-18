@@ -34,11 +34,11 @@ class EmploymentController extends Controller
     {
         $teacher = Auth::user()->teacherProfile;
 
-        if ((int) $employment->teacher_id !== (int) $teacher->id) {
+        if ((int) $employment->teacher_id != (int) $teacher->id) {
             abort(403);
         }
 
-        if ($employment->status !== 'invited') {
+        if ($employment->status != 'invited') {
             return back()->withErrors(['employment' => 'لا يمكن قبول هذه الدعوة']);
         }
 
@@ -53,11 +53,11 @@ class EmploymentController extends Controller
     {
         $teacher = Auth::user()->teacherProfile;
 
-        if ((int) $employment->teacher_id !== (int) $teacher->id) {
+        if ((int) $employment->teacher_id != (int) $teacher->id) {
             abort(403);
         }
 
-        if ($employment->status !== 'invited') {
+        if ($employment->status != 'invited') {
             return back()->withErrors(['employment' => 'لا يمكن رفض هذه الدعوة']);
         }
 

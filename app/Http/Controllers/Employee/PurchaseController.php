@@ -33,7 +33,7 @@ class PurchaseController extends Controller
             abort(403);
         }
 
-        if ($purchase->status !== Purchase::STATUS_PENDING) {
+        if ($purchase->status != Purchase::STATUS_PENDING) {
             return redirect()->back()->with('error', 'لا يمكن إتمام هذا الطلب');
         }
 

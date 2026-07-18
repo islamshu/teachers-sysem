@@ -564,7 +564,7 @@
           </template>
 
           <!-- Employee Navigation -->
-          <template v-if="$page.props.auth.user?.role !== 'teacher' && $page.props.auth.user?.role !== 'school' && $page.props.auth.user?.role !== 'admin' && !$page.props.auth.user?.is_admin">
+          <template v-if="$page.props.auth.user?.role != 'teacher' && $page.props.auth.user?.role != 'school' && $page.props.auth.user?.role != 'admin' && !$page.props.auth.user?.is_admin">
             <div class="mb-6">
               <div class="flex items-center gap-3 px-3 py-3 mb-2">
                 <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-sm">
@@ -612,7 +612,7 @@
 
           <!-- Universal Navigation for all users -->
           <nav class="space-y-1 mt-3 border-t border-surface-200 pt-3">
-            <div v-if="$page.props.auth.user?.role !== 'school' && $page.props.auth.permissions?.includes('إجراء المقابلات')">
+            <div v-if="$page.props.auth.user?.role != 'school' && $page.props.auth.permissions?.includes('إجراء المقابلات')">
               <button
                 @click="toggleSubmenu('hiring')"
                 class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium transition-all duration-200"

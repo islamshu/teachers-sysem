@@ -500,7 +500,7 @@ const loadingMore = ref(false)
 const fetchProviders = async (page = 1, append = false) => {
   const params = new URLSearchParams()
   params.set('page', page)
-  if (activeRole.value !== 'all') params.set('job_title', activeRole.value)
+  if (activeRole.value != 'all') params.set('job_title', activeRole.value)
   if (searchQuery.value) params.set('search', searchQuery.value)
 
   try {

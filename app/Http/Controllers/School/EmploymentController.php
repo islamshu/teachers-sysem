@@ -49,11 +49,11 @@ class EmploymentController extends Controller
 
         $teacher = TeacherProfile::findOrFail($data['teacher_id']);
 
-        if ($teacher->employment_status !== 'available') {
+        if ($teacher->employment_status != 'available') {
             return back()->withErrors(['teacher' => 'هذا المدرس غير متاح']);
         }
 
-        if ($teacher->status !== 'approved') {
+        if ($teacher->status != 'approved') {
             return back()->withErrors(['teacher' => 'هذا المدرس غير معتمد']);
         }
 
@@ -100,7 +100,7 @@ class EmploymentController extends Controller
 
     public function markInterviewed(Employment $employment)
     {
-        if ($employment->status !== 'accepted') {
+        if ($employment->status != 'accepted') {
             return back()->withErrors(['employment' => 'يجب أن يقبل المدرس الدعوة أولاً']);
         }
 
@@ -161,7 +161,7 @@ class EmploymentController extends Controller
 
     public function endEmployment(Employment $employment)
     {
-        if ($employment->status !== 'hired') {
+        if ($employment->status != 'hired') {
             return back()->withErrors(['employment' => 'لا يمكن إنهاء توظيف غير نشط']);
         }
 

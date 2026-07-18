@@ -212,7 +212,7 @@ const sendInvite = () => {
     preserveScroll: true,
     onSuccess: () => {
       showInviteModal.value = false
-      employeesList.value = employeesList.value.filter(e => e.id !== selectedEmployee.value?.id)
+      employeesList.value = employeesList.value.filter(e => e.id != selectedEmployee.value?.id)
       selectedEmployee.value = null
     },
   })

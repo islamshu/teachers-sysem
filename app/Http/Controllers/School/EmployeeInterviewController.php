@@ -18,7 +18,7 @@ class EmployeeInterviewController extends Controller
 {
     public function create(EmployeeInvitation $invitation)
     {
-        if ($invitation->status !== 'accepted') {
+        if ($invitation->status != 'accepted') {
             return back()->withErrors(['invitation' => 'يجب أن يقبل الموظف الدعوة أولاً']);
         }
 
@@ -37,7 +37,7 @@ class EmployeeInterviewController extends Controller
 
     public function store(Request $request, EmployeeInvitation $invitation)
     {
-        if ($invitation->status !== 'accepted') {
+        if ($invitation->status != 'accepted') {
             return back()->withErrors(['invitation' => 'يجب أن يقبل الموظف الدعوة أولاً']);
         }
 
@@ -100,7 +100,7 @@ class EmployeeInterviewController extends Controller
     {
         $invitation = $interview->invitation;
 
-        if ($invitation->status !== 'interviewed') {
+        if ($invitation->status != 'interviewed') {
             return back()->withErrors(['invitation' => 'لا يمكن توظيف هذا الموظف حالياً']);
         }
 
@@ -129,7 +129,7 @@ class EmployeeInterviewController extends Controller
     {
         $invitation = $interview->invitation;
 
-        if ($invitation->status !== 'interviewed') {
+        if ($invitation->status != 'interviewed') {
             return back()->withErrors(['invitation' => 'لا يمكن رفض هذا الموظف حالياً']);
         }
 

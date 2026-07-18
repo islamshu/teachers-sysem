@@ -292,7 +292,7 @@ const sendInvite = () => {
     preserveScroll: true,
     onSuccess: () => {
       showInviteModal.value = false
-      teachersList.value = teachersList.value.filter(t => t.id !== selectedTeacher.value?.id)
+      teachersList.value = teachersList.value.filter(t => t.id != selectedTeacher.value?.id)
       selectedTeacher.value = null
     },
   })

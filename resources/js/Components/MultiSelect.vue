@@ -118,7 +118,7 @@ function handleClickOutside(e) {
   }
 }
 
-if (typeof window !== 'undefined') {
+if (typeof window != 'undefined') {
   window.addEventListener('click', handleClickOutside)
 }
 </script>

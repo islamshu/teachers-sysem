@@ -12,7 +12,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'role', 'job_title', 'password', 'school_id', 'is_hired'])]
+#[Fillable([
+    'name',
+    'email',
+    'role',
+    'job_title',
+    'password',
+    'school_id',
+    'is_hired',
+    'telegram_link_token',
+    'telegram_chat_id',
+    'telegram_username',
+    'telegram_linked_at',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -35,7 +47,7 @@ class User extends Authenticatable
     protected function isAdmin(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->role === self::ROLE_ADMIN,
+            get: fn() => $this->role === self::ROLE_ADMIN,
         );
     }
 

@@ -28,7 +28,7 @@ class GeneralTaskController extends Controller
         return Inertia::render('Admin/GeneralTasks/Index', [
             'tasks' => $tasks->items(),
             'nextPage' => $tasks->currentPage() < $tasks->lastPage() ? $tasks->currentPage() + 1 : null,
-            'employees' => User::where('role', 'employee')->where('is_hired', true)->select('id', 'name', 'email')->get(),
+            'employees' => User::where('is_hired', true)->select('id', 'name', 'email')->get(),
             'roles' => Role::all(),
         ]);
     }

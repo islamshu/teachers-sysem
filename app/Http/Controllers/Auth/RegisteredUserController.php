@@ -42,7 +42,6 @@ class RegisteredUserController extends Controller
             'role' => $request->job_title === 'teacher' ? 'teacher' : $request->job_title,
             'job_title' => $request->job_title,
         ]);
-        $user->update([ 'telegram_link_token' => Str::random(40) ]);
 
         event(new Registered($user));
 

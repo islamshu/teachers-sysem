@@ -126,9 +126,9 @@ class PurchaseController extends Controller
         $currentBalance = $userBalance ? $userBalance->balance : 0;
         $deductAmount = $purchase->actual_amount ?? $purchase->amount;
 
-        if ($currentBalance < $deductAmount) {
-            return redirect()->back()->with('error', "الرصيد غير كافٍ. الرصيد الحالي: {$currentBalance} ريال، المبلغ المطلوب: {$deductAmount} ريال");
-        }
+        // if ($currentBalance < $deductAmount) {
+        //     return redirect()->back()->with('error', "الرصيد غير كافٍ. الرصيد الحالي: {$currentBalance} ريال، المبلغ المطلوب: {$deductAmount} ريال");
+        // }
 
         $newBalance = $currentBalance - $deductAmount;
 

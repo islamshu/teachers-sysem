@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\DailyTaskLog;
 use App\Models\FixedTask;
 use App\Models\User;
+use App\Notifications\AccountCreated;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -96,6 +97,8 @@ class EmployeeController extends Controller
 
         $roleNames = Role::whereIn('id', $validated['role_ids'])->pluck('name');
         $user->assignRole($roleNames);
+
+        $user->notify(new AccountCreated($validated['password']));
 
         return redirect()->back()->with('success', 'تم إنشاء الموظف بنجاح');
     }

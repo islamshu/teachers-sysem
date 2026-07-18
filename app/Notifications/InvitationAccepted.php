@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Employment;
+use App\Notifications\Channels\TelegramChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -19,7 +20,7 @@ class InvitationAccepted extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast', TelegramChannel::class];
     }
 
     public function toArray(object $notifiable): array
@@ -29,6 +30,13 @@ class InvitationAccepted extends Notification
             'body' => "{$this->employment->teacher->user->name} قبل دعوتك للتوظيف",
             'url' => route('school.invitations'),
             'employment_id' => $this->employment->id,
+        ];
+    }
+
+    public function toTelegram(object $notifiable): array
+    {
+        return [
+            'text' => "✅ <b>قبول دعوة توظيف</b>\n\n{$this->employment->teacher->user->name} قبل دعوتك للتوظيف.\n\n<a href=\"" . route('school.invitations') . "\">عرض الدعوات</a>",
         ];
     }
 }

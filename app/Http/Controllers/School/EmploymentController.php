@@ -8,8 +8,11 @@ use App\Models\Employment;
 use App\Models\Subject;
 use App\Models\TeacherProfile;
 use App\Notifications\EmploymentEnded;
+use App\Notifications\InterviewCompleted;
+use App\Notifications\TeacherDeclined;
 use App\Notifications\TeacherHired;
 use App\Notifications\TeacherInvited;
+use App\Notifications\TeacherRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -103,6 +106,8 @@ class EmploymentController extends Controller
 
         $employment->update(['status' => 'interviewed']);
 
+        $employment->teacher->user->notify(new InterviewCompleted($employment));
+
         return back()->with('success', 'تم تحديث الحالة إلى مقابلة');
     }
 
@@ -133,6 +138,8 @@ class EmploymentController extends Controller
         }
 
         $employment->update(['status' => 'rejected']);
+
+        $employment->teacher->user->notify(new TeacherRejected());
 
         EmploymentUpdated::dispatch('rejected', $employment);
 

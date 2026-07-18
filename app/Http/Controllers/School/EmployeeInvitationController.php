@@ -5,6 +5,10 @@ namespace App\Http\Controllers\School;
 use App\Http\Controllers\Controller;
 use App\Models\EmployeeInvitation;
 use App\Models\User;
+use App\Notifications\EmployeeHired;
+use App\Notifications\EmployeeInvited;
+use App\Notifications\EmployeeRejected;
+use App\Notifications\EmployeeEmploymentEnded;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -68,6 +72,13 @@ class EmployeeInvitationController extends Controller
             'status' => 'invited',
         ]);
 
+        $invitation = EmployeeInvitation::where('school_id', $schoolId)
+            ->where('employee_id', $employee->id)
+            ->latest()
+            ->first();
+
+        $employee->notify(new EmployeeInvited($invitation));
+
         return back()->with('success', 'تم إرسال الدعوة بنجاح');
     }
 
@@ -118,6 +129,8 @@ class EmployeeInvitationController extends Controller
             }
         }
 
+        $employee->notify(new EmployeeHired($invitation));
+
         return back()->with('success', 'تم توظيف الموظف بنجاح');
     }
 
@@ -129,6 +142,8 @@ class EmployeeInvitationController extends Controller
 
         $invitation->update(['status' => 'rejected']);
 
+        $invitation->employee->notify(new EmployeeRejected($invitation));
+
         return back()->with('success', 'تم رفض الدعوة');
     }
 
@@ -139,6 +154,8 @@ class EmployeeInvitationController extends Controller
         }
 
         $invitation->update(['status' => 'ended']);
+
+        $invitation->employee->notify(new EmploymentEnded($invitation));
 
         return back()->with('success', 'تم إنهاء توظيف الموظف بنجاح');
     }

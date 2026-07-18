@@ -7,7 +7,7 @@ use App\Notifications\Channels\TelegramChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class TeacherInvited extends Notification
+class InterviewCompleted extends Notification
 {
     use Queueable;
 
@@ -28,9 +28,9 @@ class TeacherInvited extends Notification
         $schoolName = $this->employment->school?->schoolProfile?->school_name ?? $this->employment->school?->name ?? 'مدرسة';
 
         return [
-            'title' => 'دعوة توظيف جديدة',
-            'body' => "{$schoolName} تدعوك للانضمام إليها",
-            'url' => route('teacher.invitations'),
+            'title' => 'تمت إجراء المقابلة',
+            'body' => "{$schoolName} أجرت مقابلة معك بنجاح",
+            'url' => route('teacher.my-school'),
             'employment_id' => $this->employment->id,
         ];
     }
@@ -40,7 +40,7 @@ class TeacherInvited extends Notification
         $schoolName = $this->employment->school?->schoolProfile?->school_name ?? $this->employment->school?->name ?? 'مدرسة';
 
         return [
-            'text' => "🏫 <b>دعوة توظيف جديدة</b>\n\n{$schoolName} تدعوك للانضمام إليها.\n\n<a href=\"" . route('teacher.invitations') . "\">عرض الدعوة</a>",
+            'text' => "📝 <b>تمت إجراء المقابلة</b>\n\n{$schoolName} أجرت مقابلة معك.\n\n<a href=\"" . route('teacher.my-school') . "\">عرض النتيجة</a>",
         ];
     }
 }

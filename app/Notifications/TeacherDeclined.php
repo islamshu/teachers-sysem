@@ -7,7 +7,7 @@ use App\Notifications\Channels\TelegramChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class TeacherInvited extends Notification
+class TeacherDeclined extends Notification
 {
     use Queueable;
 
@@ -25,22 +25,18 @@ class TeacherInvited extends Notification
 
     public function toArray(object $notifiable): array
     {
-        $schoolName = $this->employment->school?->schoolProfile?->school_name ?? $this->employment->school?->name ?? 'مدرسة';
-
         return [
-            'title' => 'دعوة توظيف جديدة',
-            'body' => "{$schoolName} تدعوك للانضمام إليها",
-            'url' => route('teacher.invitations'),
+            'title' => 'تم رفض الدعوة',
+            'body' => "{$this->employment->teacher->user->name} رفض دعوتك للتوظيف",
+            'url' => route('school.invitations'),
             'employment_id' => $this->employment->id,
         ];
     }
 
     public function toTelegram(object $notifiable): array
     {
-        $schoolName = $this->employment->school?->schoolProfile?->school_name ?? $this->employment->school?->name ?? 'مدرسة';
-
         return [
-            'text' => "🏫 <b>دعوة توظيف جديدة</b>\n\n{$schoolName} تدعوك للانضمام إليها.\n\n<a href=\"" . route('teacher.invitations') . "\">عرض الدعوة</a>",
+            'text' => "❌ <b>تم رفض الدعوة</b>\n\n{$this->employment->teacher->user->name} رفض دعوتك للتوظيف.\n\n<a href=\"" . route('school.invitations') . "\">عرض الدعوات</a>",
         ];
     }
 }

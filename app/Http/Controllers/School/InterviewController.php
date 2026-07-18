@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Employment;
 use App\Models\Interview;
 use App\Models\InterviewQuestion;
+use App\Notifications\InterviewCompleted;
 use App\Notifications\TeacherHired;
+use App\Notifications\TeacherRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -71,6 +73,8 @@ class InterviewController extends Controller
 
         $employment->update(['status' => 'interviewed']);
 
+        $employment->teacher->user->notify(new InterviewCompleted($employment));
+
         return redirect()->route('school.interviews.show', $interview)
             ->with('success', 'تم إجراء المقابلة بنجاح');
     }
@@ -124,6 +128,8 @@ class InterviewController extends Controller
         }
 
         $employment->update(['status' => 'rejected']);
+
+        $employment->teacher->user->notify(new TeacherRejected());
 
         return redirect()->route('school.invitations')
             ->with('success', 'تم رفض المدرس');

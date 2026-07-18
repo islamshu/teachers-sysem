@@ -2,20 +2,20 @@
 
 namespace App\Notifications;
 
-use App\Models\Employment;
+use App\Models\EmployeeInvitation;
 use App\Notifications\Channels\TelegramChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class EmploymentEnded extends Notification
+class EmployeeEmploymentEnded extends Notification
 {
     use Queueable;
 
-    public Employment $employment;
+    public EmployeeInvitation $invitation;
 
-    public function __construct(Employment $employment)
+    public function __construct(EmployeeInvitation $invitation)
     {
-        $this->employment = $employment;
+        $this->invitation = $invitation;
     }
 
     public function via(object $notifiable): array
@@ -28,15 +28,14 @@ class EmploymentEnded extends Notification
         return [
             'title' => 'تم إنهاء التوظيف',
             'body' => 'تم إنهاء التعاقد معك من قبل المدرسة',
-            'url' => route('teacher.my-school'),
-            'employment_id' => $this->employment->id,
+            'url' => route('employee.invitations.index'),
         ];
     }
 
     public function toTelegram(object $notifiable): array
     {
         return [
-            'text' => "⚠️ <b>تم إنهاء التوظيف</b>\n\nتم إنهاء التعاقد معك من قبل المدرسة.\n\n<a href=\"" . route('teacher.my-school') . "\">عرض المدرسة</a>",
+            'text' => "⚠️ <b>تم إنهاء التوظيف</b>\n\nتم إنهاء التعاقد معك من قبل المدرسة.\n\n<a href=\"" . route('employee.invitations.index') . "\">عرض التفاصيل</a>",
         ];
     }
 }

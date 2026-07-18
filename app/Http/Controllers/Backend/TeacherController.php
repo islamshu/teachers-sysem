@@ -155,6 +155,7 @@ class TeacherController extends Controller
         }
 
         $userId = $teacher->user_id;
+        $userName = $teacher->user->name;
         $teacher->grades()->detach();
         $teacher->delete();
 

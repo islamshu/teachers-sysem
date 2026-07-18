@@ -2,20 +2,16 @@
 
 namespace App\Notifications;
 
-use App\Models\Employment;
 use App\Notifications\Channels\TelegramChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class TeacherHired extends Notification
+class TeacherRejected extends Notification
 {
     use Queueable;
 
-    public Employment $employment;
-
-    public function __construct(Employment $employment)
+    public function __construct()
     {
-        $this->employment = $employment;
     }
 
     public function via(object $notifiable): array
@@ -26,17 +22,16 @@ class TeacherHired extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'تم توظيفك',
-            'body' => 'مبروك! تم توظيفك في المدرسة',
+            'title' => 'تم رفض طلب التوظيف',
+            'body' => 'تم رفض طلب التوظيف الخاص بك من المدرسة',
             'url' => route('teacher.my-school'),
-            'employment_id' => $this->employment->id,
         ];
     }
 
     public function toTelegram(object $notifiable): array
     {
         return [
-            'text' => "🎉 <b>مبروك! تم توظيفك</b>\n\nتم توظيفك في المدرسة بنجاح.\n\n<a href=\"" . route('teacher.my-school') . "\">عرض المدرسة</a>",
+            'text' => "⚠️ <b>تم رفض طلب التوظيف</b>\n\nتم رفض طلب التوظيف الخاص بك من المدرسة.\n\n<a href=\"" . route('teacher.my-school') . "\">عرض التفاصيل</a>",
         ];
     }
 }

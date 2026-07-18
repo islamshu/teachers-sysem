@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Channels\TelegramChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -18,7 +19,7 @@ class ProfileApproved extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast', TelegramChannel::class];
     }
 
     public function toArray(object $notifiable): array
@@ -30,6 +31,15 @@ class ProfileApproved extends Notification
             'title' => 'تم اعتماد الحساب',
             'body' => "تم اعتماد حساب {$label} الخاص بك بنجاح",
             'url' => route($route),
+        ];
+    }
+
+    public function toTelegram(object $notifiable): array
+    {
+        $label = $this->profileType === 'teacher' ? 'المدرس' : 'المدرسة';
+
+        return [
+            'text' => "🎉 <b>تم اعتماد الحساب</b>\n\nتم اعتماد حساب {$label} الخاص بك بنجاح.\nيمكنك الآن استخدام جميع المميزات.",
         ];
     }
 }

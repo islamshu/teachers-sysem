@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Employment;
 use App\Notifications\InvitationAccepted;
+use App\Notifications\TeacherDeclined;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -61,6 +62,8 @@ class EmploymentController extends Controller
         }
 
         $employment->update(['status' => 'rejected']);
+
+        $employment->school->notify(new TeacherDeclined($employment));
 
         return back()->with('success', 'تم رفض الدعوة');
     }

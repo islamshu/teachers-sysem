@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BalanceTransaction;
 use App\Models\User;
 use App\Models\UserBalance;
+use App\Notifications\BalanceAdded;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -69,6 +70,9 @@ class BalanceController extends Controller
             'description' => $validated['description'],
             'added_by' => auth()->id(),
         ]);
+
+        $user = User::find($validated['user_id']);
+        $user->notify(new BalanceAdded($validated['amount']));
 
         return redirect()->route('admin.balances.index')
             ->with('success', 'تم إضافة الرصيد بنجاح');

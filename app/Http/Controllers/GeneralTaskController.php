@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Events\TaskUpdated;
 use App\Models\GeneralTask;
 use App\Models\GeneralTaskLog;
+use App\Models\User;
+use App\Notifications\TaskCompleted;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -81,6 +83,8 @@ class GeneralTaskController extends Controller
             'completed_at' => now(),
         ]);
 
+        $this->notifyTaskCompleted($generalTask, $user);
+
         TaskUpdated::dispatch('general', 'completed', ['task_id' => $generalTask->id, 'user_id' => $user->id]);
 
         return redirect()->back()->with('success', 'تم إنجاز المهمة');
@@ -97,5 +101,20 @@ class GeneralTaskController extends Controller
         TaskUpdated::dispatch('general', 'undone', ['task_id' => $generalTask->id, 'user_id' => $user->id]);
 
         return redirect()->back()->with('success', 'تم التراجع عن إنجاز المهمة');
+    }
+
+    private function notifyTaskCompleted(GeneralTask $task, User $completer): void
+    {
+        $recipients = collect();
+
+        if ($task->creator) {
+            $recipients->push($task->creator);
+        }
+
+        User::where('role', 'admin')->each(fn ($admin) => $recipients->push($admin));
+
+        $recipients->unique('id')->each(function ($recipient) use ($task, $completer) {
+            $recipient->notify(new TaskCompleted('general', $task->name, $completer->name, $task->id));
+        });
     }
 }

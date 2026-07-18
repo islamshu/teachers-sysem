@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Events\TaskUpdated;
 use App\Models\DailyTaskLog;
 use App\Models\FixedTask;
+use App\Models\User;
+use App\Notifications\TaskCompleted;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -72,6 +74,8 @@ class FixedTaskController extends Controller
             'completed_at' => now(),
         ]);
 
+        $this->notifyTaskCompleted('fixed', $fixedTask, $user);
+
         TaskUpdated::dispatch('fixed', 'completed', ['task_id' => $fixedTask->id, 'user_id' => $user->id]);
 
         return redirect()->back()->with('success', 'تم إنجاز المهمة');
@@ -90,5 +94,20 @@ class FixedTaskController extends Controller
         TaskUpdated::dispatch('fixed', 'undone', ['task_id' => $fixedTask->id, 'user_id' => $user->id]);
 
         return redirect()->back()->with('success', 'تم التراجع عن إنجاز المهمة');
+    }
+
+    private function notifyTaskCompleted(string $taskType, FixedTask $task, User $completer): void
+    {
+        $recipients = collect();
+
+        if ($task->creator) {
+            $recipients->push($task->creator);
+        }
+
+        User::where('role', 'admin')->each(fn ($admin) => $recipients->push($admin));
+
+        $recipients->unique('id')->each(function ($recipient) use ($taskType, $task, $completer) {
+            $recipient->notify(new TaskCompleted($taskType, $task->name, $completer->name, $task->id));
+        });
     }
 }

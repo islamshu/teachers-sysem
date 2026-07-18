@@ -36,13 +36,13 @@ use App\Http\Controllers\School\InterviewController as SchoolInterviewController
 use App\Http\Controllers\SchoolProfileController;
 use App\Http\Controllers\Teacher\EmploymentController as TeacherEmploymentController;
 use App\Http\Controllers\TeacherProfileController;
+use App\Http\Controllers\TelegramController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
 // Public routes - الصفحة الرئيسية تعرض المدرسين المقبولين
 Route::get('/', [FrontendTeacherController::class, 'index'])
     ->name('home');
-Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);
 // تحويل /teachers إلى الصفحة الرئيسية
 Route::get('/teachers', function () {
     return redirect('/');

@@ -44,41 +44,65 @@
       </div>
 
       <!-- Telegram Connection -->
-      <div class="card p-6 mb-6 animate-fade-in-up animate-delay-100">
-        <h2 class="text-xl font-bold text-slate-900 mb-2">ربط Telegram</h2>
-        <p class="text-sm text-slate-500 mb-6">استقبل إشعارات المدرسة مباشرة على Telegram</p>
-
-        <div v-if="user?.telegram_chat_id" class="flex items-center gap-4 p-4 bg-green-50 rounded-xl border border-green-200">
-          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-green-800">Telegram مربوط ✅</p>
-            <p v-if="user?.telegram_username" class="text-sm text-green-600">@{{ user.telegram_username }}</p>
-            <p v-if="user?.telegram_linked_at" class="text-xs text-green-500 mt-0.5">تاريخ الربط: {{ (() => { const d = new Date(user.telegram_linked_at); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}` })() }}</p>
+      <div class="card overflow-hidden mb-6 animate-fade-in-up animate-delay-100">
+        <!-- Connected State -->
+        <div v-if="user?.telegram_chat_id" class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500"></div>
+          <div class="absolute inset-0 opacity-10" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;)"></div>
+          <div class="relative p-6 md:p-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-900/20">
+                <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-white">Telegram مربوط</h3>
+                <p v-if="user?.telegram_username" class="text-emerald-100 text-sm mt-0.5">@{{ user.telegram_username }}</p>
+                <p v-if="user?.telegram_linked_at" class="text-emerald-200/80 text-xs mt-1">
+                  مربوط منذ {{ (() => { const d = new Date(user.telegram_linked_at); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}` })() }}
+                </p>
+              </div>
+              <div class="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-xl">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                متصل
+              </div>
+            </div>
           </div>
         </div>
 
-        <div v-else class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-              </svg>
-            </div>
-            <div>
-              <p class="font-bold text-slate-800">اربط حساب Telegram</p>
-              <p class="text-sm text-slate-500">استقبل جميع إشعارات المدرسة مباشرة</p>
+        <!-- Not Connected State -->
+        <div v-else class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700"></div>
+          <div class="absolute inset-0 opacity-10" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;)"></div>
+          <div class="relative p-6 md:p-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/20">
+                <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-white">ربط Telegram</h3>
+                <p class="text-blue-100 text-sm mt-0.5">استقبل إشعارات المدرسة مباشرة على جهازك</p>
+              </div>
+              <button
+                @click="connectTelegram"
+                :disabled="connecting"
+                class="w-full sm:w-auto bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
+              >
+                <svg v-if="connecting" class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+                ربط الآن
+              </button>
             </div>
           </div>
-          <button @click="connectTelegram" :disabled="connecting" class="btn-primary">
-            <svg v-if="connecting" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            ربط الآن
-          </button>
         </div>
       </div>
 

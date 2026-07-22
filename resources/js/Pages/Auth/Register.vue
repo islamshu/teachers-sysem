@@ -57,7 +57,7 @@
             <select id="job_title" v-model="form.job_title" class="input-base" :class="{ 'input-error': form.errors.job_title }" required>
               <option value="">اختر المسمى الوظيفي</option>
               <option v-for="role in roles" :key="role.name" :value="role.name">
-                {{ role.name }}
+                {{ roleLabel(role.name) }}
               </option>
             </select>
             <p v-if="form.errors.job_title" class="mt-1.5 text-sm text-red-500 font-medium">{{ form.errors.job_title }}</p>
@@ -124,5 +124,14 @@ const submit = () => {
   form.post('/register', {
     onError: () => form.reset('password', 'password_confirmation'),
   })
+}
+const roleLabel = (name) => {
+  const labels = {
+    admin: 'إداري',
+    school: 'مدرسة',
+    teacher: 'مدرس',
+    employee: 'موظف',
+  }
+  return labels[name] || name
 }
 </script>

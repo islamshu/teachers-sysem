@@ -16,6 +16,31 @@ class FixedTaskController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        if ($user->isTeacher() && !$user->teacherProfile) {
+            return Inertia::render('Tasks/Index', [
+                'tasks' => collect(),
+                'completedCount' => 0,
+                'totalCount' => 0,
+                'today' => Carbon::today()->format('Y-m-d'),
+            ]);
+        }
+
+        if ($user->isTeacher()) {
+            $isHired = $user->teacherProfile->employment_status === 'employed'
+                || \App\Models\Employment::where('teacher_id', $user->teacherProfile->id)
+                    ->where('status', 'hired')
+                    ->exists();
+
+            if (!$isHired) {
+                return Inertia::render('Tasks/Index', [
+                    'tasks' => collect(),
+                    'completedCount' => 0,
+                    'totalCount' => 0,
+                    'today' => Carbon::today()->format('Y-m-d'),
+                ]);
+            }
+        }
         $today = Carbon::today();
 
         $roleIds = $user->roles->pluck('id');

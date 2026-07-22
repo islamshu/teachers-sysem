@@ -430,6 +430,8 @@ Route::middleware('auth')->group(function () {
                 ->name('employees.index');
             Route::post('/employees', [EmployeeController::class, 'store'])
                 ->name('employees.store');
+            Route::post('/employees/teacher', [EmployeeController::class, 'storeTeacher'])
+                ->name('employees.store-teacher');
             Route::put('/employees/{user}', [EmployeeController::class, 'update'])
                 ->name('employees.update');
             Route::delete('/employees/{user}', [EmployeeController::class, 'destroy'])

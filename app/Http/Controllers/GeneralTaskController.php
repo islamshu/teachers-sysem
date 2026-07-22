@@ -16,6 +16,31 @@ class GeneralTaskController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        if ($user->isTeacher() && !$user->teacherProfile) {
+            return Inertia::render('GeneralTasks/Index', [
+                'tasks' => collect(),
+                'completedCount' => 0,
+                'totalCount' => 0,
+                'now' => now()->format('Y-m-d H:i:s'),
+            ]);
+        }
+
+        if ($user->isTeacher()) {
+            $isHired = $user->teacherProfile->employment_status === 'employed'
+                || \App\Models\Employment::where('teacher_id', $user->teacherProfile->id)
+                    ->where('status', 'hired')
+                    ->exists();
+
+            if (!$isHired) {
+                return Inertia::render('GeneralTasks/Index', [
+                    'tasks' => collect(),
+                    'completedCount' => 0,
+                    'totalCount' => 0,
+                    'now' => now()->format('Y-m-d H:i:s'),
+                ]);
+            }
+        }
         $roleIds = $user->roles->pluck('id');
 
         $assignedViaRoles = GeneralTask::available()

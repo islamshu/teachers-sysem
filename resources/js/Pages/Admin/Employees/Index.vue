@@ -6,12 +6,20 @@
           <h1 class="text-3xl font-extrabold text-slate-900">إدارة الموظفين</h1>
           <p class="text-slate-500 mt-1">إضافة وتعديل وحذف الموظفين الإداريين</p>
         </div>
-        <button @click="openAddModal" class="btn-primary">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          إضافة موظف
-        </button>
+        <div class="flex gap-3">
+          <button @click="openAddModal" class="btn-primary">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            إضافة موظف
+          </button>
+          <button @click="openTeacherModal" class="btn-primary" style="background-color: #059669;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            إضافة مدرس
+          </button>
+        </div>
       </div>
 
       <Alert v-if="flash.message" variant="success" :title="flash.message" closeable class="mb-6 animate-fade-in-down" />
@@ -57,7 +65,7 @@
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1.5">
                     <span
-                      v-for="role in employee.roles.filter(r => r.name != 'teacher')"
+                      v-for="role in employee.roles"
                       :key="role.id"
                       class="inline-flex px-2.5 py-0.5 rounded-lg bg-primary-100 text-primary-700 text-xs font-semibold"
                     >
@@ -265,6 +273,83 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Add Teacher Modal -->
+    <Teleport to="body">
+      <div v-if="showTeacherModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="closeTeacherModal">
+        <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" @click="closeTeacherModal"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 animate-scale-in max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <span class="text-lg">👨‍🏫</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">إضافة مدرس جديد</h3>
+          </div>
+
+          <form @submit.prevent="submitTeacherForm">
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">الاسم <span class="text-red-500">*</span></label>
+              <input v-model="teacherForm.name" type="text" class="input-base" placeholder="أدخل اسم المدرس" required />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">البريد الإلكتروني <span class="text-red-500">*</span></label>
+              <input v-model="teacherForm.email" type="email" class="input-base" placeholder="teacher@example.com" required />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">كلمة المرور <span class="text-red-500">*</span></label>
+              <input v-model="teacherForm.password" type="password" class="input-base" placeholder="********" required />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">رقم الهاتف</label>
+              <input v-model="teacherForm.phone" type="text" class="input-base" placeholder="05XXXXXXXX" />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">المبحث <span class="text-red-500">*</span></label>
+              <select v-model="teacherForm.subject_id" class="input-base" required>
+                <option value="" disabled>اختر المبحث</option>
+                <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">سنوات الخبرة</label>
+              <input v-model="teacherForm.experience_years" type="number" min="0" class="input-base" placeholder="0" />
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-slate-700 mb-2">الفروع <span class="text-red-500">*</span></label>
+              <div class="space-y-2 max-h-40 overflow-y-auto p-3 bg-surface-50 rounded-xl">
+                <label
+                  v-for="branch in branches"
+                  :key="branch.id"
+                  class="flex items-center gap-3 cursor-pointer group"
+                >
+                  <input
+                    type="checkbox"
+                    :value="branch.id"
+                    v-model="teacherForm.branch_ids"
+                    class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span class="text-sm text-slate-700 group-hover:text-slate-900">{{ branch.name }}</span>
+                </label>
+                <p v-if="branches.length === 0" class="text-sm text-slate-400 text-center py-2">لا توجد فروع. قم بإضافة فرع أولاً</p>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <button type="submit" class="btn-primary flex-1" style="background-color: #059669;" :disabled="teacherForm.processing">
+                {{ teacherForm.processing ? 'جاري الإنشاء...' : 'إنشاء وتوظيف المدرس' }}
+              </button>
+              <button type="button" @click="closeTeacherModal" class="btn-ghost px-6">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Teleport>
   </DashboardLayout>
 </template>
 
@@ -280,6 +365,7 @@ const props = defineProps({
   employees: Array,
   branches: Array,
   roles: Array,
+  subjects: Array,
 })
 
 const page = usePage()
@@ -305,6 +391,7 @@ const matchesSearch = (item, term) => {
 const filteredList = computed(() => props.employees.filter(item => matchesSearch(item, search.value)))
 
 const showModal = ref(false)
+const showTeacherModal = ref(false)
 const editingEmployee = ref(null)
 const showReportModal = ref(false)
 const reportEmployee = ref(null)
@@ -318,6 +405,16 @@ const form = useForm({
   password: '',
   branch_ids: [],
   role_ids: [],
+})
+
+const teacherForm = useForm({
+  name: '',
+  email: '',
+  password: '',
+  phone: '',
+  subject_id: '',
+  experience_years: 0,
+  branch_ids: [],
 })
 
 const roleLabel = (name) => {
@@ -353,6 +450,22 @@ const openEditModal = (employee) => {
 const closeModal = () => {
   showModal.value = false
   form.reset()
+}
+
+const openTeacherModal = () => {
+  teacherForm.name = ''
+  teacherForm.email = ''
+  teacherForm.password = ''
+  teacherForm.phone = ''
+  teacherForm.subject_id = ''
+  teacherForm.experience_years = 0
+  teacherForm.branch_ids = []
+  showTeacherModal.value = true
+}
+
+const closeTeacherModal = () => {
+  showTeacherModal.value = false
+  teacherForm.reset()
 }
 
 const openReport = async (employee) => {
@@ -400,6 +513,12 @@ const submitForm = () => {
       onSuccess: () => closeModal(),
     })
   }
+}
+
+const submitTeacherForm = () => {
+  teacherForm.post('/admin/employees/teacher', {
+    onSuccess: () => closeTeacherModal(),
+  })
 }
 
 const confirmDelete = (employee) => {

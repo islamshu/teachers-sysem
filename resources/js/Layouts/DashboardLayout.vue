@@ -515,11 +515,11 @@
                 </template>
                 <template v-else>
                   <Link
-                    href="/teacher-profile/create"
+                    href="/complete-profile/create"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
-                    :class="isActive('/teacher-profile/create') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
+                    :class="isActive('/complete-profile/create') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
                   >
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/teacher-profile/create') ? 'bg-primary-100' : 'bg-surface-100'">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="isActive('/complete-profile/create') ? 'bg-primary-100' : 'bg-surface-100'">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
@@ -548,6 +548,7 @@
               </template>
 
               <Link
+                v-if="$page.props.isHired"
                 href="/teacher/my-school"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
                 :class="isActive('/teacher/my-school') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
@@ -658,7 +659,7 @@
               </div>
             </div>
             <Link
-              v-if="$page.props.auth.permissions?.includes('الرد على الدعوات')"
+              v-if="$page.props.auth.permissions?.includes('الرد على الدعوات') && !$page.props.auth.user?.roles?.some(r => r.name === 'teacher')"
               href="/teacher/invitations"
               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
               :class="isActive('/teacher/invitations') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"
@@ -670,7 +671,7 @@
               </div>
               <span>دعوات التوظيف</span>
             </Link>
-            <div>
+            <div v-if="$page.props.auth.user?.role !== 'teacher' || $page.props.isHired">
               <button
                 @click="toggleSubmenu('tasks')"
                 class="flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium transition-all duration-200"
@@ -750,7 +751,7 @@
             </div>
 
             <Link
-              v-if="$page.props.hasBalance"
+              v-if="$page.props.hasBalance && ($page.props.auth.user?.role !== 'teacher' || $page.props.isHired)"
               href="/purchases"
               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200"
               :class="isActive('/purchases') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:bg-surface-100 hover:text-slate-900'"

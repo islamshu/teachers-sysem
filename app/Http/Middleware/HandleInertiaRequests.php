@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Employment;
 use App\Models\FixedTask;
 use App\Models\GeneralTask;
 use App\Models\Setting;
@@ -43,29 +44,46 @@ class HandleInertiaRequests extends Middleware
         if ($user) {
             $roleIds = $user->roles->pluck('id');
 
-            $incompleteFixedTasks = FixedTask::active()
-                ->whereHas('roles', fn ($q) => $q->whereIn('roles.id', $roleIds))
-                ->whereDoesntHave('logs', fn ($q) => $q->where('user_id', $user->id)->whereDate('date', Carbon::today()))
-                ->count();
+            $isTeacher = $user->isTeacher();
+            $isHired = $user->is_hired;
+            $showTasks = !$isTeacher || $isHired;
 
-            $incompleteGeneralTasks = GeneralTask::available()
-                ->where(function ($q) use ($user, $roleIds) {
-                    $q->whereHas('roles', fn ($q2) => $q2->whereIn('roles.id', $roleIds))
-                      ->orWhereHas('assignedUsers', fn ($q2) => $q2->where('users.id', $user->id));
-                })
-                ->whereDoesntHave('logs', fn ($q) => $q->where('user_id', $user->id))
-                ->count();
+            if ($showTasks) {
+                $incompleteFixedTasks = FixedTask::active()
+                    ->whereHas('roles', fn ($q) => $q->whereIn('roles.id', $roleIds))
+                    ->whereDoesntHave('logs', fn ($q) => $q->where('user_id', $user->id)->whereDate('date', Carbon::today()))
+                    ->count();
+
+                $incompleteGeneralTasks = GeneralTask::available()
+                    ->where(function ($q) use ($user, $roleIds) {
+                        $q->whereHas('roles', fn ($q2) => $q2->whereIn('roles.id', $roleIds))
+                          ->orWhereHas('assignedUsers', fn ($q2) => $q2->where('users.id', $user->id));
+                    })
+                    ->whereDoesntHave('logs', fn ($q) => $q->where('user_id', $user->id))
+                    ->count();
+            } else {
+                $incompleteFixedTasks = 0;
+                $incompleteGeneralTasks = 0;
+            }
 
             $badges['incompleteTasks'] = $incompleteFixedTasks + $incompleteGeneralTasks;
             $badges['incompleteFixedTasks'] = $incompleteFixedTasks;
             $badges['incompleteGeneralTasks'] = $incompleteGeneralTasks;
 
-            $badges['incompletePurchases'] = $user->purchases()
-                ->where('status', 'pending')
-                ->count();
+            $badges['incompletePurchases'] = $showTasks
+                ? $user->purchases()->where('status', 'pending')->count()
+                : 0;
         }
 
         $hasBalance = $user ? UserBalance::where('user_id', $user->id)->where('balance', '>', 0)->exists() : false;
+
+        $isHired = false;
+        if ($user && $user->teacherProfile) {
+            $isHired = $user->teacherProfile->employment_status === 'employed'
+                || Employment::where('teacher_id', $user->teacherProfile->id)
+                    ->where('status', 'hired')
+                    ->exists();
+        }
 
         $spatieRoles = \Spatie\Permission\Models\Role::where('name', '!=', 'admin')
             ->orderBy('name')
@@ -81,6 +99,7 @@ class HandleInertiaRequests extends Middleware
             'spatieRoles' => $spatieRoles,
             'badges' => $badges,
             'hasBalance' => $hasBalance,
+            'isHired' => $isHired,
             'locale' => session('locale', 'ar'),
             'flash' => [
                 'message' => session('message') ?: session('success') ?: session('error'),

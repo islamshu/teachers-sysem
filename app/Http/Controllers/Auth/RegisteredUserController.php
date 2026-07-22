@@ -43,6 +43,8 @@ class RegisteredUserController extends Controller
             'job_title' => $request->job_title,
         ]);
 
+        $user->assignRole($user->role);
+
         event(new Registered($user));
 
         Auth::login($user);

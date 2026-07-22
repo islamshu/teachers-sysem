@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\DailyTaskLog;
+use App\Models\Employment;
 use App\Models\FixedTask;
+use App\Models\Subject;
+use App\Models\TeacherProfile;
 use App\Models\User;
 use App\Notifications\AccountCreated;
 use Carbon\Carbon;
@@ -32,6 +35,7 @@ class EmployeeController extends Controller
             'nextPage' => $employees->currentPage() < $employees->lastPage() ? $employees->currentPage() + 1 : null,
             'branches' => Branch::all(),
             'roles' => Role::all(),
+            'subjects' => Subject::orderBy('name')->get(),
         ]);
     }
 
@@ -101,6 +105,57 @@ class EmployeeController extends Controller
         $user->notify(new AccountCreated($validated['password']));
 
         return redirect()->back()->with('success', 'تم إنشاء الموظف بنجاح');
+    }
+
+    public function storeTeacher(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'branch_ids' => ['required', 'array', 'min:1'],
+            'branch_ids.*' => ['exists:branches,id'],
+            'subject_id' => ['required', 'exists:subjects,id'],
+            'experience_years' => ['nullable', 'integer', 'min:0'],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'teacher',
+            'is_hired' => true,
+        ]);
+
+        $user->assignRole('teacher');
+        $user->branches()->attach($validated['branch_ids']);
+
+        $teacherProfile = TeacherProfile::create([
+            'user_id' => $user->id,
+            'subject_id' => $validated['subject_id'],
+            'experience_years' => $validated['experience_years'] ?? 0,
+            'phone' => $validated['phone'] ?? null,
+            'status' => 'approved',
+            'employment_status' => 'employed',
+            'grades' => '',
+        ]);
+
+        $school = User::where('role', 'school')->first();
+
+        if ($school) {
+            Employment::create([
+                'school_id' => $school->id,
+                'teacher_id' => $teacherProfile->id,
+                'subject_id' => $validated['subject_id'],
+                'status' => 'hired',
+                'hired_at' => now(),
+            ]);
+        }
+
+        $user->notify(new AccountCreated($validated['password']));
+
+        return redirect()->back()->with('success', 'تم إنشاء المدرس وتوظيفه بنجاح');
     }
 
     public function update(Request $request, User $user)

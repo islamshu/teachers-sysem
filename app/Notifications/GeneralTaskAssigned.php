@@ -58,7 +58,9 @@ class GeneralTaskAssigned extends Notification
             default => 'تحديث على مهمة',
         };
 
-        $dates = "من: {$this->task->start_at->format('Y-m-d H:i')}\nإلى: {$this->task->end_at->format('Y-m-d H:i')}";
+        $start = \Carbon\Carbon::parse($this->task->getRawOriginal('start_at'))->format('Y-m-d H:i');
+        $end = \Carbon\Carbon::parse($this->task->getRawOriginal('end_at'))->format('Y-m-d H:i');
+        $dates = "من: {$start}\nإلى: {$end}";
 
         return [
             'text' => "{$icon} <b>{$title}</b>\n\n{$this->task->name}\n{$dates}\n\n<a href=\"" . route('general-tasks.user.index') . "\">عرض المهام</a>",

@@ -151,7 +151,7 @@ class GeneralTaskController extends Controller
             'description' => $validated['description'] ?? null,
             'start_at' => Carbon::parse($validated['start_at']),
             'end_at' => Carbon::parse($validated['end_at']),
-            'is_active' => $validated['is_active'] ?? true,
+            'is_active' =>  true,
             'created_by' => auth()->id(),
             'attachment_required' => $validated['attachment_required'] ?? false,
         ]);

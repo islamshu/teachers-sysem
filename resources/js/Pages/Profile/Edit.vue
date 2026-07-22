@@ -57,7 +57,7 @@
           <div>
             <p class="font-bold text-green-800">Telegram مربوط ✅</p>
             <p v-if="user?.telegram_username" class="text-sm text-green-600">@{{ user.telegram_username }}</p>
-            <p v-if="user?.telegram_linked_at" class="text-xs text-green-500 mt-0.5">تاريخ الربط: {{ new Date(user.telegram_linked_at).toLocaleDateString('ar-SA') }}</p>
+            <p v-if="user?.telegram_linked_at" class="text-xs text-green-500 mt-0.5">تاريخ الربط: {{ (() => { const d = new Date(user.telegram_linked_at); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}` })() }}</p>
           </div>
         </div>
 

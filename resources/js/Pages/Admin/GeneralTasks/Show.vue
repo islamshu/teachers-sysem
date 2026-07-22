@@ -31,6 +31,22 @@
               {{ task.is_active ? (isOverdue ? 'منتهية' : 'نشط') : 'غير نشط' }}
             </span>
           </span>
+          <span v-if="task.attachments?.length" class="text-sm text-slate-500">
+            المرفقات:
+            <span class="inline-flex flex-wrap gap-1.5 mr-1">
+              <span
+                v-for="att in task.attachments"
+                :key="att.id"
+                class="inline-flex items-center gap-1 text-slate-700 font-semibold"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                {{ att.name }}
+              </span>
+            </span>
+          </span>
+          <span v-if="task.attachment_required" class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600">مرفق مطلوب</span>
           <span class="text-sm text-slate-500 mr-auto">
             إجمالي المستخدمين: <strong class="text-slate-700">{{ users.length }}</strong>
           </span>
@@ -93,6 +109,7 @@
                   </button>
                 </th>
                 <th class="px-6 py-4 text-center text-sm font-bold text-slate-700">وقت الإنجاز</th>
+                <th v-if="task.attachment_required && task.attachments?.length" class="px-6 py-4 text-center text-sm font-bold text-slate-700">المرفقات المرسلة</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-surface-100">
@@ -128,9 +145,27 @@
                   </span>
                   <span v-else class="text-xs text-slate-400">—</span>
                 </td>
+                <td v-if="task.attachment_required && task.attachments?.length" class="px-6 py-4">
+                  <div v-if="user.completions?.length" class="space-y-1">
+                    <div v-for="(comp, ci) in user.completions" :key="ci" class="flex items-center gap-1.5">
+                      <span class="text-xs text-slate-500">{{ comp.attachment_name }}:</span>
+                      <a
+                        :href="`/storage/${comp.file_path}`"
+                        target="_blank"
+                        class="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-800 transition-colors"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        تحميل
+                      </a>
+                    </div>
+                  </div>
+                  <span v-else class="text-xs text-slate-400">—</span>
+                </td>
               </tr>
               <tr v-if="filteredUsers.length === 0">
-                <td colspan="4" class="px-6 py-12 text-center text-slate-500">لا يوجد مستخدمون مسندون لهذه المهمة</td>
+                <td :colspan="task.attachment_required && task.attachments?.length ? 5 : 4" class="px-6 py-12 text-center text-slate-500">لا يوجد مستخدمون مسندون لهذه المهمة</td>
               </tr>
             </tbody>
           </table>
@@ -161,6 +196,7 @@ const props = defineProps({
   sort: String,
   order: String,
   filter: String,
+  now: String,
 })
 
 const search = ref('')
@@ -172,21 +208,21 @@ const filteredUsers = computed(() => {
 })
 
 const isOverdue = computed(() => {
-  return new Date(props.task.end_at) < new Date()
+  return new Date(props.task.end_at) < new Date(props.now)
 })
 
 const formatDate = (dt) => {
   if (!dt) return '-'
   const d = new Date(dt)
-  return d.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
-    d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 const formatDateTime = (dt) => {
   if (!dt) return ''
   const d = new Date(dt)
-  return d.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' }) + ' ' +
-    d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 const statusLabel = (status) => {

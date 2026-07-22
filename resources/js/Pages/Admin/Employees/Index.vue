@@ -500,7 +500,8 @@ const loadReport = async () => {
 const formatTime = (datetime) => {
   if (!datetime) return ''
   const d = new Date(datetime)
-  return d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 const submitForm = () => {

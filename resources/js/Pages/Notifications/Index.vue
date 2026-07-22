@@ -98,6 +98,8 @@ const timeAgo = (date) => {
   if (hours < 24) return `منذ ${hours} ساعة`
   const days = Math.floor(hours / 24)
   if (days < 7) return `منذ ${days} أيام`
-  return new Date(date).toLocaleDateString('ar-SA')
+  const d = new Date(date)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`
 }
 </script>

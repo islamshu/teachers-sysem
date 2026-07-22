@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Events\TaskUpdated;
 use App\Models\GeneralTask;
+use App\Models\GeneralTaskCompletion;
 use App\Models\GeneralTaskLog;
 use App\Models\User;
 use App\Notifications\TaskCompleted;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class GeneralTaskController extends Controller
@@ -22,7 +23,7 @@ class GeneralTaskController extends Controller
                 'tasks' => collect(),
                 'completedCount' => 0,
                 'totalCount' => 0,
-                'now' => now()->format('Y-m-d H:i:s'),
+                'now' => now()->format('Y-m-d\TH:i:s'),
             ]);
         }
 
@@ -37,7 +38,7 @@ class GeneralTaskController extends Controller
                     'tasks' => collect(),
                     'completedCount' => 0,
                     'totalCount' => 0,
-                    'now' => now()->format('Y-m-d H:i:s'),
+                    'now' => now()->format('Y-m-d\TH:i:s'),
                 ]);
             }
         }
@@ -52,10 +53,24 @@ class GeneralTaskController extends Controller
         $taskIds = $assignedViaRoles->pluck('id')->merge($assignedDirectly->pluck('id'))->unique();
 
         $tasks = GeneralTask::whereIn('id', $taskIds)
-            ->with('logs')
+            ->with('logs', 'attachments')
             ->get()
             ->map(function ($task) use ($user) {
                 $log = $task->logs->where('user_id', $user->id)->first();
+
+                $completions = [];
+                if ($log) {
+                    $completions = GeneralTaskCompletion::where('general_task_id', $task->id)
+                        ->where('user_id', $user->id)
+                        ->get()
+                        ->map(fn ($c) => [
+                            'attachment_id' => $c->general_task_attachment_id,
+                            'file_path' => $c->file_path,
+                        ])
+                        ->keyBy('attachment_id')
+                        ->toArray();
+                }
+
                 return [
                     'id' => $task->id,
                     'name' => $task->name,
@@ -64,6 +79,13 @@ class GeneralTaskController extends Controller
                     'end_at' => $task->end_at,
                     'completed' => (bool) $log,
                     'completed_at' => $log?->completed_at,
+                    'attachments' => $task->attachments->map(fn ($a) => [
+                        'id' => $a->id,
+                        'name' => $a->name,
+                        'file_path' => $a->file_path,
+                    ]),
+                    'attachment_required' => $task->attachment_required,
+                    'user_completions' => $completions,
                 ];
             });
 
@@ -74,7 +96,7 @@ class GeneralTaskController extends Controller
             'tasks' => $tasks,
             'completedCount' => $completedCount,
             'totalCount' => $totalCount,
-            'now' => now()->format('Y-m-d H:i:s'),
+            'now' => now()->format('Y-m-d\TH:i:s'),
         ]);
     }
 
@@ -83,7 +105,7 @@ class GeneralTaskController extends Controller
         $user = auth()->user();
         $roleIds = $user->roles->pluck('id');
 
-        if (!$generalTask->is_active || $generalTask->end_at->isPast()) {
+        if (!$generalTask->is_active || \Carbon\Carbon::parse($generalTask->getRawOriginal('end_at'))->isPast()) {
             return redirect()->back()->with('error', 'لا يمكن إنجاز هذه المهمة');
         }
 
@@ -102,11 +124,34 @@ class GeneralTaskController extends Controller
             return redirect()->back()->with('error', 'تم إنجاز هذه المهمة بالفعل');
         }
 
+        $generalTask->load('attachments');
+
+        if ($generalTask->attachment_required) {
+            foreach ($generalTask->attachments as $att) {
+                if (!$request->hasFile("completion_files.{$att->id}")) {
+                    return redirect()->back()->with('error', "يجب رفع مرفق \"{$att->name}\" لإتمام المهمة");
+                }
+            }
+        }
+
         GeneralTaskLog::create([
             'general_task_id' => $generalTask->id,
             'user_id' => $user->id,
             'completed_at' => now(),
         ]);
+
+        foreach ($generalTask->attachments as $att) {
+            $fileKey = "completion_files.{$att->id}";
+            if ($request->hasFile($fileKey)) {
+                $filePath = $request->file($fileKey)->store('general-task-completions', 'public');
+                GeneralTaskCompletion::create([
+                    'general_task_id' => $generalTask->id,
+                    'user_id' => $user->id,
+                    'general_task_attachment_id' => $att->id,
+                    'file_path' => $filePath,
+                ]);
+            }
+        }
 
         $this->notifyTaskCompleted($generalTask, $user);
 
@@ -118,6 +163,16 @@ class GeneralTaskController extends Controller
     public function undo(GeneralTask $generalTask)
     {
         $user = auth()->user();
+
+        GeneralTaskCompletion::where('general_task_id', $generalTask->id)
+            ->where('user_id', $user->id)
+            ->each(function ($c) {
+                Storage::disk('public')->delete($c->file_path);
+            });
+
+        GeneralTaskCompletion::where('general_task_id', $generalTask->id)
+            ->where('user_id', $user->id)
+            ->delete();
 
         GeneralTaskLog::where('general_task_id', $generalTask->id)
             ->where('user_id', $user->id)

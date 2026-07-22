@@ -380,13 +380,9 @@ const props = defineProps({
 
 const formatDate = (date) => {
   if (!date) return ''
-
   const d = new Date(date)
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`
 }
 
 const currentType = ref(props.type)

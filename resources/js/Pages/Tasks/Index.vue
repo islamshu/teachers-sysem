@@ -95,13 +95,17 @@ const props = defineProps({
 const page = usePage()
 const flash = page.props.flash || {}
 
-const todayDate = new Date().toLocaleDateString('ar-SA', {
-  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-})
+const todayDate = (() => {
+  const d = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`
+})()
 
 const formatTime = (date) => {
   if (!date) return ''
-  return new Date(date).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+  const d = new Date(date)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 const toggleTask = (task) => {

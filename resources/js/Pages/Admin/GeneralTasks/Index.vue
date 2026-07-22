@@ -35,7 +35,18 @@
             </thead>
             <tbody class="divide-y divide-surface-100">
               <tr v-for="task in filteredList" :key="task.id" class="hover:bg-primary-50/50 transition-colors">
-                <td class="px-6 py-4 font-medium text-slate-900">{{ task.name }}</td>
+                <td class="px-6 py-4 font-medium text-slate-900">
+                  <div class="flex items-center gap-1.5">
+                    {{ task.name }}
+                    <span v-if="task.attachments?.length" class="inline-flex items-center gap-0.5 text-xs text-sky-600" :title="`${task.attachments.length} مرفق(ات)`">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                      {{ task.attachments.length }}
+                    </span>
+                    <span v-if="task.attachment_required" class="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-600">مطلوب</span>
+                  </div>
+                </td>
                 <td class="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">{{ task.description || '-' }}</td>
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1.5">
@@ -143,48 +154,117 @@
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-semibold text-slate-700 mb-2">الموظفون المستهدفون</label>
-              <div class="space-y-2 max-h-32 overflow-y-auto p-3 bg-surface-50 rounded-xl">
-                <label
-                  v-for="emp in employees"
-                  :key="emp.id"
-                  class="flex items-center gap-3 cursor-pointer group"
-                >
-                  <input
-                    type="checkbox"
-                    :value="emp.id"
-                    v-model="form.user_ids"
-                    class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
-                  />
-                  <span class="text-sm text-slate-700 group-hover:text-slate-900">{{ emp.name }}</span>
-                  <span class="text-xs text-slate-400 mr-auto">{{ emp.email }}</span>
-                </label>
-              </div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">الموظفون المستهدفون</label>
+              <MultiSelect
+                v-model="form.user_ids"
+                :options="employees.map(e => ({ id: e.id, label: e.name + ' — ' + e.email }))"
+                placeholder="اختر الموظفين..."
+                searchPlaceholder="بحث بالاسم أو البريد..."
+              />
             </div>
 
-            <div class="mb-6">
-              <label class="block text-sm font-semibold text-slate-700 mb-2">الأدوار المستهدفة</label>
-              <div class="space-y-2 max-h-32 overflow-y-auto p-3 bg-surface-50 rounded-xl">
-                <label
-                  v-for="role in roles"
-                  :key="role.id"
-                  class="flex items-center gap-3 cursor-pointer group"
-                >
-                  <input
-                    type="checkbox"
-                    :value="role.id"
-                    v-model="form.role_ids"
-                    class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
-                  />
-                  <span class="text-sm text-slate-700 group-hover:text-slate-900">{{ roleLabel(role.name) }}</span>
-                </label>
-              </div>
+            <div class="mb-5">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">الأدوار المستهدفة</label>
+              <MultiSelect
+                v-model="form.role_ids"
+                :options="roles.map(r => ({ id: r.id, label: roleLabel(r.name) }))"
+                placeholder="اختر الأدوار..."
+                searchPlaceholder="بحث..."
+              />
               <p class="text-xs text-slate-400 mt-1">* يجب اختيار موظف واحد على الأقل أو دور واحد</p>
             </div>
 
+            <!-- Attachments Section -->
+            <div class="mb-4 p-4 bg-surface-50 rounded-xl border border-surface-200">
+              <label class="block text-sm font-semibold text-slate-700 mb-3">هل تريد إضافة مرفقات؟</label>
+              <div class="flex gap-4 mb-3">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" :value="true" v-model="form.has_attachments" class="w-4 h-4 text-primary-600" />
+                  <span class="text-sm text-slate-700">نعم</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" :value="false" v-model="form.has_attachments" class="w-4 h-4 text-primary-600" />
+                  <span class="text-sm text-slate-700">لا</span>
+                </label>
+              </div>
+
+              <div v-if="form.has_attachments" class="space-y-3">
+                <!-- Existing Attachments (edit mode) — name only -->
+                <div
+                  v-for="(att, index) in form.existing_attachments"
+                  :key="'existing-' + att.id"
+                  class="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-200"
+                >
+                  <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                  <span class="text-sm text-emerald-700 font-medium flex-1">{{ att.name }}</span>
+                  <button
+                    type="button"
+                    @click="removeExistingAttachment(index)"
+                    class="p-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors shrink-0"
+                    title="حذف المرفق"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- New Attachment Rows (name only, no file) -->
+                <div
+                  v-for="(att, index) in form.attachments"
+                  :key="'new-' + index"
+                  class="flex items-center gap-2 p-3 bg-white rounded-lg border border-surface-200"
+                >
+                  <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                  <input
+                    v-model="att.name"
+                    type="text"
+                    class="flex-1 input-base text-sm"
+                    placeholder="اسم المرفق (مثال: نموذج التقرير)"
+                  />
+                  <button
+                    type="button"
+                    @click="removeAttachment(index)"
+                    class="p-2 rounded-lg text-red-500 hover:bg-red-100 transition-colors shrink-0"
+                    title="إزالة"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  @click="addAttachment"
+                  class="flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  إضافة مرفق
+                </button>
+
+                <div class="mt-3 pt-3 border-t border-surface-200">
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      v-model="form.attachment_required"
+                      class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span class="text-sm text-slate-700 group-hover:text-slate-900">المستخدم مطلوب منه رفع مرفق عند إتمام المهمة</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <div class="flex gap-3">
-              <button type="submit" class="btn-primary flex-1" :disabled="form.processing">
-                {{ form.processing ? 'جاري الحفظ...' : (editingTask ? 'تحديث' : 'إضافة') }}
+              <button type="submit" class="btn-primary flex-1" :disabled="submitting">
+                {{ submitting ? 'جاري الحفظ...' : (editingTask ? 'تحديث' : 'إضافة') }}
               </button>
               <button type="button" @click="closeModal" class="btn-ghost px-6">إلغاء</button>
             </div>
@@ -196,16 +276,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { Link, useForm, usePage } from '@inertiajs/vue3'
+import { ref, reactive, computed } from 'vue'
+import { Link, router, usePage } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Alert from '@/Components/Alert.vue'
 import TableSearch from '@/Components/TableSearch.vue'
+import MultiSelect from '@/Components/MultiSelect.vue'
 
 const props = defineProps({
   tasks: Array,
   employees: Array,
   roles: Array,
+  now: String,
 })
 
 const page = usePage()
@@ -233,14 +315,22 @@ const filteredList = computed(() => props.tasks.filter(item => matchesSearch(ite
 const showModal = ref(false)
 const editingTask = ref(null)
 
-const form = useForm({
+const defaultForm = () => ({
   name: '',
   description: '',
   start_at: '',
   end_at: '',
   user_ids: [],
   role_ids: [],
+  has_attachments: false,
+  attachments: [{ name: '', file: null }],
+  attachment_required: false,
+  existing_attachments: [],
+  remove_attachment_ids: [],
 })
+
+const form = reactive(defaultForm())
+const submitting = ref(false)
 
 const roleLabel = (name) => {
   const labels = { admin: 'إداري', school: 'مدرسة', teacher: 'مدرس', employee: 'موظف' }
@@ -250,13 +340,13 @@ const roleLabel = (name) => {
 const formatDate = (dt) => {
   if (!dt) return '-'
   const d = new Date(dt)
-  return d.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
-    d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 const taskStatusClass = (task) => {
   if (!task.is_active) return 'bg-slate-100 text-slate-500'
-  const now = new Date()
+  const now = new Date(props.now)
   const start = new Date(task.start_at)
   const end = new Date(task.end_at)
   if (now < start) return 'bg-amber-100 text-amber-700'
@@ -266,7 +356,7 @@ const taskStatusClass = (task) => {
 
 const taskStatusLabel = (task) => {
   if (!task.is_active) return 'غير نشط'
-  const now = new Date()
+  const now = new Date(props.now)
   const start = new Date(task.start_at)
   const end = new Date(task.end_at)
   if (now < start) return 'قادمة'
@@ -274,40 +364,101 @@ const taskStatusLabel = (task) => {
   return 'نشط'
 }
 
+const addAttachment = () => {
+  form.attachments.push({ name: '', file: null })
+}
+
+const removeAttachment = (index) => {
+  form.attachments.splice(index, 1)
+  if (form.attachments.length === 0) {
+    form.attachments.push({ name: '', file: null })
+  }
+}
+
+const removeExistingAttachment = (index) => {
+  const att = form.existing_attachments[index]
+  if (att) {
+    form.remove_attachment_ids.push(att.id)
+    form.existing_attachments.splice(index, 1)
+  }
+}
+
 const openAddModal = () => {
   editingTask.value = null
-  form.name = ''
-  form.description = ''
-  form.start_at = ''
-  form.end_at = ''
-  form.user_ids = []
-  form.role_ids = []
+  Object.assign(form, defaultForm())
   showModal.value = true
 }
 
 const openEditModal = (task) => {
   editingTask.value = task
-  form.name = task.name
-  form.description = task.description || ''
-  form.start_at = task.start_at ? task.start_at.slice(0, 16) : ''
-  form.end_at = task.end_at ? task.end_at.slice(0, 16) : ''
-  form.user_ids = task.assigned_users?.map(u => u.id) || []
-  form.role_ids = task.roles?.map(r => r.id) || []
+  const existingAtts = task.attachments || []
+  Object.assign(form, {
+    name: task.name,
+    description: task.description || '',
+    start_at: task.start_at ? task.start_at.slice(0, 16) : '',
+    end_at: task.end_at ? task.end_at.slice(0, 16) : '',
+    user_ids: task.assigned_users?.map(u => u.id) || [],
+    role_ids: task.roles?.map(r => r.id) || [],
+    has_attachments: existingAtts.length > 0,
+    attachments: [{ name: '', file: null }],
+    attachment_required: task.attachment_required || false,
+    existing_attachments: existingAtts.map(a => ({ id: a.id, name: a.name, file_path: a.file_path })),
+    remove_attachment_ids: [],
+  })
   showModal.value = true
 }
 
 const closeModal = () => {
   showModal.value = false
-  form.reset()
+  Object.assign(form, defaultForm())
+}
+
+const buildFormData = () => {
+  const fd = new FormData()
+  fd.append('name', form.name || '')
+  fd.append('description', form.description || '')
+  fd.append('start_at', form.start_at || '')
+  fd.append('end_at', form.end_at || '')
+  fd.append('is_active', form.is_active ? '1' : '0')
+  fd.append('has_attachments', form.has_attachments ? '1' : '0')
+  fd.append('attachment_required', form.attachment_required ? '1' : '0')
+
+  ;(form.user_ids || []).forEach((id, i) => fd.append(`user_ids[${i}]`, id))
+  ;(form.role_ids || []).forEach((id, i) => fd.append(`role_ids[${i}]`, id))
+
+  if (form.has_attachments) {
+    let fileIndex = 0
+    ;(form.attachments || []).forEach((att) => {
+      if (att.name && att.name.trim()) {
+        fd.append(`attachment_names[${fileIndex}]`, att.name.trim())
+        fileIndex++
+      }
+    })
+  }
+
+  if (editingTask.value) {
+    ;(form.remove_attachment_ids || []).forEach((id, i) => fd.append(`remove_attachment_ids[${i}]`, id))
+    ;(form.existing_attachments || []).forEach((att, i) => fd.append(`existing_attachment_ids[${i}]`, att.id))
+  }
+
+  return fd
 }
 
 const submitForm = () => {
+  submitting.value = true
+  const fd = buildFormData()
+
   if (editingTask.value) {
-    form.put(`/admin/general-tasks/${editingTask.value.id}`, {
+    fd.append('_method', 'PUT')
+    router.post(`/admin/general-tasks/${editingTask.value.id}`, fd, {
+      forceFormData: true,
+      onFinish: () => { submitting.value = false },
       onSuccess: () => closeModal(),
     })
   } else {
-    form.post('/admin/general-tasks', {
+    router.post('/admin/general-tasks', fd, {
+      forceFormData: true,
+      onFinish: () => { submitting.value = false },
       onSuccess: () => closeModal(),
     })
   }
@@ -315,9 +466,7 @@ const submitForm = () => {
 
 const confirmDelete = (task) => {
   if (confirm(`هل أنت متأكد من حذف "${task.name}"؟`)) {
-    useForm({}).delete(`/admin/general-tasks/${task.id}`, {
-      onSuccess: () => {},
-    })
+    router.delete(`/admin/general-tasks/${task.id}`)
   }
 }
 </script>

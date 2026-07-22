@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GeneralTaskLog extends Model
 {
-    protected $fillable = ['general_task_id', 'user_id', 'completed_at', 'notes'];
+    protected $fillable = ['general_task_id', 'user_id', 'completed_at', 'notes', 'completion_attachment'];
 
     protected function casts(): array
     {

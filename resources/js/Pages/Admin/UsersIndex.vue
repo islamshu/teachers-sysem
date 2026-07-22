@@ -235,7 +235,8 @@ const roleLabel = (role) => {
 const formatDate = (date) => {
   if (!date) return '-'
   const d = new Date(date)
-  return d.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' })
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`
 }
 
 const loadMore = async () => {

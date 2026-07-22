@@ -140,9 +140,9 @@ const filteredList = computed(() => props.branches.filter(item => matchesSearch(
 
 const formatDate = (date) => {
   if (!date) return '-'
-  return new Date(date).toLocaleDateString('ar-SA', {
-    year: 'numeric', month: 'short', day: 'numeric'
-  })
+  const d = new Date(date)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`
 }
 
 const openAddModal = () => {
